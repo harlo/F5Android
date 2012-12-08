@@ -61,8 +61,6 @@ public class JpegEncoder {
     // westfeld
     InputStream embeddedData = null;
 
-    String password = null;
-
     int n = 0;
 
     public JpegEncoder(final Bitmap image, final int quality, final OutputStream out, final String comment) {
@@ -89,21 +87,23 @@ public class JpegEncoder {
     	this.JpegObj.Comment = comment;
     }
 
-    public void Compress() {
+    public boolean Compress() {
         WriteHeaders(this.outStream);
         WriteCompressedData(this.outStream);
         WriteEOI(this.outStream);
         try {
             this.outStream.flush();
+            return true;
         } catch (final IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
+            Log.e(Jpeg.LOG, "IO Error: " + e.getMessage());
         }
+        
+        return false;
     }
 
-    public void Compress(final InputStream embeddedData, final String password) {
+    public boolean Compress(final InputStream embeddedData) {
         this.embeddedData = embeddedData;
-        this.password = password;
-        Compress();
+        return Compress();
     }
 
     public int getQuality() {
@@ -121,7 +121,7 @@ public class JpegEncoder {
             length = ((data[2] & 0xFF) << 8) + (data[3] & 0xFF) + 2;
             out.write(data, 0, length);
         } catch (final IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
+            Log.e(Jpeg.LOG, "IO Error: " + e.getMessage());
         }
     }
 
@@ -302,7 +302,7 @@ public class JpegEncoder {
         if (this.embeddedData != null) {
             // Now we embed the secret data in the permutated sequence.
         	Log.d(Jpeg.LOG, "Permutation starts");
-            final F5Random random = new F5Random(this.password);
+            final F5Random random = new F5Random();
             final Permutation permutation = new Permutation(coeffCount, random);
             int nextBitToEmbed = 0;
             int byteToEmbed = 0;
@@ -600,9 +600,11 @@ public class JpegEncoder {
         JFIF[16] = (byte) 0x00;
         JFIF[17] = (byte) 0x00;
 
+        /*
         if (this.JpegObj.getComment().equals("JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ")) {
             JFIF[10] = (byte) 0x00; // 1.00
         }
+        */
         WriteArray(JFIF, out);
 
         // Comment Header

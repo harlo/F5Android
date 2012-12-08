@@ -3,8 +3,8 @@ package info.guardianproject.f5android;
 import james.Jpeg;
 import james.JpegEncoder;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -25,37 +25,46 @@ public class Embed {
     // .tif, .gif, .jpg
     // If not, print the standard use info.
     boolean haveInputImage = false;
-    String embFileName = null;
     String comment = "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
     String inFileName = null;
     String outFileName = null;
+    String secret_message = null;
     
-    public Embed(Activity a, String inFileName) {
-    	this(a, inFileName, null, null);
+    public interface EmbedListener {
+    	public void onEmbedded(File outFile);
     }
     
-    public Embed(Activity a, String inFileName, String outFileName, String password) {
+    public Embed(Activity a, String inFileName, String secret_message) {
+    	this(a, "F5Android", inFileName, null, secret_message);
+    }
+    
+    public Embed(Activity a, String dump_dir, String inFileName, String secret_message) {
+    	this(a, dump_dir, inFileName, null, secret_message);
+    	
+    	this.secret_message = secret_message;
+    }
+    
+    public Embed(Activity a, String dump_dir, String inFileName, String outFileName, String secret_message) {
     	this.a = a;
     	this.inFileName = inFileName;
     	this.file = new File(this.inFileName);
     	
-    	root_dir = new File(Environment.getExternalStorageDirectory(), "jpegStegoTest");
+    	root_dir = new File(Environment.getExternalStorageDirectory(), dump_dir);
     	if(!root_dir.exists())
     		root_dir.mkdir();
     	
     	if(outFileName == null) {
-    		this.outFile = new File(root_dir, this.file.getName().replace(".jpg", "_embed.jpg"));
+    		String extension = this.file.getName().substring(this.file.getName().lastIndexOf(".") - 1);
+    		this.outFile = new File(root_dir, this.file.getName().replace(extension, "_embed.jpg"));
     		this.outFileName = this.outFile.getAbsolutePath();
     	} else {
     		this.outFileName = outFileName;
     		this.outFile = new File(outFileName);
     	}
-    	
-    	this.embFileName = new File(root_dir, "test_embed.txt").getAbsolutePath();
-    	
+    	    	
     	i = 1;
     	while(outFile.exists()) {
-    		this.outFile = new File(outFileName.substring(0, this.outFileName.lastIndexOf(".")) + i++ + ".jpg");
+    		this.outFile = new File(root_dir, outFile.getName().substring(0, outFile.getName().lastIndexOf(".")) + "_" + i++ + ".jpg");
     		if(i > 100)
     			return;
     	}
@@ -69,7 +78,9 @@ public class Embed {
     		jpg = new JpegEncoder(image, Quality, dataOut, comment);
     		
     		try {
-    			jpg.Compress(new FileInputStream(embFileName), password);
+    			if(jpg.Compress(new ByteArrayInputStream(secret_message.getBytes()))) {
+    				((EmbedListener) a).onEmbedded(outFile);
+    			}
     		} catch(final Exception e) {
     			Log.e(Jpeg.LOG, e.toString());
     			e.printStackTrace();

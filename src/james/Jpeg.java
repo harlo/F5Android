@@ -20,7 +20,7 @@ import android.util.Log;
 
 public class Jpeg {
 	Activity a;
-	File root_dir = new File(Environment.getExternalStorageDirectory(), "jpegStegoTest");
+	File root_dir = new File(Environment.getExternalStorageDirectory(), "F5Android");
 	File inFile, outFile;
 	FileOutputStream dataOut = null;
 	JpegEncoder jpg;
@@ -97,8 +97,8 @@ public class Jpeg {
 		}
     }
     
-    public void compress(InputStream embedFile, String password) {
-    	jpg.Compress(embedFile, password);
+    public void compress(InputStream embedFile) {
+    	jpg.Compress(embedFile);
 		try {
 			dataOut.close();
 		} catch(final IOException e) {}

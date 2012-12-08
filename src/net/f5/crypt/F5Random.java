@@ -1,35 +1,28 @@
 package net.f5.crypt;
 
 import java.security.Provider;
-import java.security.SecureRandom;
 import java.security.Security;
+
+import sun.security.provider.SecureRandom;
 
 public class F5Random {
     private SecureRandom random = null;
 
     private byte[] b = null;
     
-    public F5Random() {
-    	this(null);
-    }
-
-	public F5Random(String password) {
+	public F5Random() {
 		for(Provider p : Security.getProviders()) {
             System.out.println("PROVIDER: " + p.getName());
         }
+		
         this.random = new SecureRandom();
-        try {
-        	this.random.setSeed(password.getBytes());
-        } catch(NullPointerException e) {
-        	this.random.setSeed(new String("helloworld").getBytes());
-        }
-        
+        this.random.engineSetSeed(new String("abcdefg123").getBytes());
         this.b = new byte[1];
     }
 
     // get a random byte
     public int getNextByte() {
-        this.random.nextBytes(this.b);
+        this.random.engineNextBytes(this.b);
         return this.b[0];
     }
 

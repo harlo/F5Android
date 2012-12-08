@@ -18,14 +18,14 @@ import net.f5.ortega.HuffmanDecode;
 
 
 public class Extract {
-    private static File f; // carrier file
+    private File f; // carrier file
     private Activity a;
 
-    private static byte[] carrier; // carrier data
+    private byte[] carrier; // carrier data
 
-    private static int[] coeff; // dct values
+    private int[] coeff; // dct values
 
-    private static ByteArrayOutputStream fos; // embedded file (output file)
+    private ByteArrayOutputStream fos; // embedded file (output file)
 
     private static byte[] deZigZag = {
             0, 1, 5, 6, 14, 15, 27, 28, 2, 4, 7, 13, 16, 26, 29, 42, 3, 8, 12, 17, 25, 30, 41, 43, 9, 11, 18, 24, 31,
@@ -36,18 +36,18 @@ public class Extract {
     	public void onExtractionResult(ByteArrayOutputStream baos);
     }
     
-    public Extract(Activity a, File f) {
-    	this(a, f, null);
+    public Extract(Activity a, String f) {
+    	this(a, new File(f));
     }
     
-    public Extract(Activity a, File f, String password) {
+    public Extract(Activity a, File f) {
     	fos = new ByteArrayOutputStream();
     	this.f = f;
     	this.a = a;
     	
     	try {
-    		final FileInputStream fis = new FileInputStream(f);
-			extract(fis, (int) f.length(), fos, password);
+    		final FileInputStream fis = new FileInputStream(this.f);
+			extract(fis, (int) f.length(), fos);
 		} catch (IOException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
@@ -55,7 +55,7 @@ public class Extract {
     	
     }
 
-    public static void extract(final InputStream fis, final int flength, final OutputStream fos, final String password)
+    public void extract(InputStream fis, int flength, ByteArrayOutputStream fos)
             throws IOException {
         carrier = new byte[flength];
         fis.read(carrier);
@@ -64,7 +64,7 @@ public class Extract {
         coeff = hd.decode();
         
         Log.d(Jpeg.LOG, "Permutation starts");
-        final F5Random random = new F5Random(password);
+        final F5Random random = new F5Random();
         final Permutation permutation = new Permutation(coeff.length, random);
         
         Log.d(Jpeg.LOG, coeff.length + " indices shuffled");
@@ -190,6 +190,8 @@ public class Extract {
         if (nBytesExtracted < extractedFileLength) {
         	Log.d(Jpeg.LOG, "Incomplete file: only " + nBytesExtracted + " of " + extractedFileLength
                     + " bytes extracted");
+        } else {
+        	((ExtractionListener) a).onExtractionResult(fos);
         }
     }
 
