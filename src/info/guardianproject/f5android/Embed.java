@@ -20,7 +20,7 @@ public class Embed {
 	FileOutputStream dataOut = null;
     File file, outFile, root_dir;
     JpegEncoder jpg;
-    int i, Quality = 80;
+    int i, Quality = 90;
     // Check to see if the input file name has one of the extensions:
     // .tif, .gif, .jpg
     // If not, print the standard use info.
