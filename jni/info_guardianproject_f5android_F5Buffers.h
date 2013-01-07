@@ -33,6 +33,14 @@ JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuff
 
 /*
  * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    initHuffmanDecodeBuffer
+ * Signature: (I)Ljava/nio/ByteBuffer;
+ */
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuffmanDecodeBuffer
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
  * Method:    setPixelValues
  * Signature: (Ljava/nio/ByteBuffer;[III)V
  */
@@ -161,6 +169,22 @@ JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanB
 
 /*
  * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    setHuffmanDecodeBufferValues
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;II)V
+ */
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setHuffmanDecodeBufferValues
+  (JNIEnv *, jobject, jobject, jobject, jint, jint);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    getHuffmanDecodeBufferValue
+ * Signature: (Ljava/nio/ByteBuffer;I)I
+ */
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanDecodeBufferValue
+  (JNIEnv *, jobject, jobject, jint);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
  * Method:    cleanUpImage
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
@@ -181,6 +205,14 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpCoef
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
 JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuffmanBuffer
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    cleanUpHuffmanDecodeBuffer
+ * Signature: (Ljava/nio/ByteBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuffmanDecodeBuffer
   (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus

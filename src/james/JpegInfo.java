@@ -14,6 +14,7 @@
 
 package james;
 
+import info.guardianproject.f5android.F5Buffers;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -80,6 +81,8 @@ class JpegInfo {
     public int MaxHsampFactor;
 
     public int MaxVsampFactor;
+    
+    public F5Buffers f5 = new F5Buffers();
 
     public JpegInfo(final Bitmap image, final String comment) {
         this.Components = new Object[this.NumberOfComponents];
@@ -95,6 +98,56 @@ class JpegInfo {
         this.Comment = comment;
         getYCCArray();
         
+    }
+    
+    void downsampleCb1(int comp) {
+    	Log.d(Jpeg.LOG, "downsampling cb1: ");
+    	int inrow, incol;
+        int outrow, outcol;
+        float temp;
+        int bias;
+        inrow = 0;
+        incol = 0;
+        
+        for(outrow=0; outrow<this.compHeight[comp]; outrow++) {
+        	bias = 1;
+        	for(outcol=0; outcol<this.compWidth[comp]; outcol++) {
+        		temp = this.f5.getCb1Value(inrow, incol++);
+        		temp += this.f5.getCb1Value(inrow++, incol--);
+        		temp += this.f5.getCb1Value(inrow, incol++);
+        		temp += this.f5.getCb1Value(inrow--, incol++) + bias;
+        		
+        		this.f5.setCb2Values(temp/(float) 4.0, outrow, outcol);
+        		bias ^= 3;
+        	}
+        	inrow += 2;
+        	incol = 0;
+        }
+    }
+    
+    void downsampleCr1(int comp) {
+    	Log.d(Jpeg.LOG, "downsampling cr1: ");
+    	int inrow, incol;
+        int outrow, outcol;
+        float temp;
+        int bias;
+        inrow = 0;
+        incol = 0;
+        
+        for(outrow=0; outrow<this.compHeight[comp]; outrow++) {
+        	bias = 1;
+        	for(outcol=0; outcol<this.compWidth[comp]; outcol++) {
+        		temp = this.f5.getCr1Value(inrow, incol++);
+        		temp += this.f5.getCr1Value(inrow++, incol--);
+        		temp += this.f5.getCr1Value(inrow, incol++);
+        		temp += this.f5.getCr1Value(inrow--, incol++) + bias;
+        		
+        		this.f5.setCr2Values(temp/(float) 4.0, outrow, outcol);
+        		bias ^= 3;
+        	}
+        	inrow += 2;
+        	incol = 0;
+        }
     }
 
     float[][] DownSample(final float[][] C, final int comp) {
@@ -133,19 +186,7 @@ class JpegInfo {
      */
 
     private void getYCCArray() {
-        final int values[] = new int[this.imageWidth * this.imageHeight];
         int r, g, b, y, x;
-        
-        imageobj.getPixels(values, 0, this.imageWidth, 0, 0, this.imageWidth, this.imageHeight);
-        imageobj.recycle();
-        
-        System.gc();
-        try {
-        	Thread.sleep(100);
-        } catch(Exception e) {
-        	Log.e(Jpeg.LOG, e.toString());
-        	e.printStackTrace();
-        }
         
         this.MaxHsampFactor = 1;
         this.MaxVsampFactor = 1;
@@ -173,18 +214,41 @@ class JpegInfo {
         }
         
         // XXX: throws outofmemory errors! move to JNI?
-        Log.d(Jpeg.LOG, "BTW, comp height and width: " + this.compHeight[0] + ", " + this.compWidth[0]);
-        final float Y[][] = new float[this.compHeight[0]][this.compWidth[0]];
-        final float Cr1[][] = new float[this.compHeight[0]][this.compWidth[0]];
-        final float Cb1[][] = new float[this.compHeight[0]][this.compWidth[0]];
-        float Cb2[][] = new float[this.compHeight[1]][this.compWidth[1]];
-        float Cr2[][] = new float[this.compHeight[2]][this.compWidth[2]];
+        this.f5.initF5Image(new int[] {this.imageWidth, this.imageHeight}, this.compWidth, this.compHeight);
+        //final int values[] = new int[this.imageWidth * this.imageHeight];
+        
+        int current = 0;
+        for(int i=0; i<this.imageHeight; i++) {
+        	int[] values = new int[this.imageWidth];
+        	imageobj.getPixels(values, 0, this.imageWidth, 0, i, this.imageWidth, 1);
+        	
+        	this.f5.setPixelValues(values, current);
+
+        	// XXX: CHECK?
+        	Log.d(Jpeg.LOG, "Pixel Value\nlast java: " + values[values.length - 1] + "\nlast c++: " + this.f5.getPixelValue((current + this.imageWidth) -1));
+        	
+        	current += this.imageWidth;
+        }
+        
+        imageobj.recycle();
+        
+        System.gc();
+        try {
+        	Thread.sleep(100);
+        } catch(Exception e) {
+        	Log.e(Jpeg.LOG, e.toString());
+        	e.printStackTrace();
+        }
+        
+        //final float Y[][] = new float[this.compHeight[0]][this.compWidth[0]];
         int index = 0;
         for (y = 0; y < this.imageHeight; ++y) {
             for (x = 0; x < this.imageWidth; ++x) {
-                r = values[index] >> 16 & 0xff;
-                g = values[index] >> 8 & 0xff;
-                b = values[index] & 0xff;
+            	int pixel_value = this.f5.getPixelValue(index);
+            	
+                r = pixel_value >> 16 & 0xff;
+                g = pixel_value >> 8 & 0xff;
+                b = pixel_value & 0xff;
 
                 // The following three lines are a more correct color conversion
                 // but
@@ -197,9 +261,9 @@ class JpegInfo {
                 // 0.33126 * (float)g + 0.5 * (float)b));
                 // Cr1[y][x] = 128 + (float)(0.8784*(0.5 * (float)r - 0.41869 *
                 // (float)g - 0.08131 * (float)b));
-                Y[y][x] = (float) (0.299 * r + 0.587 * g + 0.114 * b);
-                Cb1[y][x] = 128 + (float) (-0.16874 * r - 0.33126 * g + 0.5 * b);
-                Cr1[y][x] = 128 + (float) (0.5 * r - 0.41869 * g - 0.08131 * b);
+                this.f5.setYValues((float) (0.299 * r + 0.587 * g + 0.114 * b), y, x);
+                this.f5.setCb1Values(128 + (float) (-0.16874 * r - 0.33126 * g + 0.5 * b), y, x);
+                this.f5.setCr1Values(128 + (float) (0.5 * r - 0.41869 * g - 0.08131 * b), y, x);
                 index++;
             }
         }
@@ -211,11 +275,8 @@ class JpegInfo {
         // Downsampling is currently supported. The downsampling method here
         // is a simple box filter.
 
-        this.Components[0] = Y;
-        Cb2 = DownSample(Cb1, 1);
-        this.Components[1] = Cb2;
-        Cr2 = DownSample(Cr1, 2);
-        this.Components[2] = Cr2;
+        downsampleCb1(1);
+        downsampleCr1(2);
     }
 
     public void setComment(final String comment) {

@@ -23,7 +23,7 @@ public class Extract {
 
     private byte[] carrier; // carrier data
 
-    private int[] coeff; // dct values
+    //private int[] coeff; // dct values
 
     private ByteArrayOutputStream fos; // embedded file (output file)
 
@@ -61,13 +61,14 @@ public class Extract {
         fis.read(carrier);
         final HuffmanDecode hd = new HuffmanDecode(carrier);
         Log.d(Jpeg.LOG, "Huffman decoding starts");
-        coeff = hd.decode();
+        //coeff = hd.decode();
+        int coeff_length = hd.decode();
         
         Log.d(Jpeg.LOG, "Permutation starts");
         final F5Random random = new F5Random();
-        final Permutation permutation = new Permutation(coeff.length, random);
+        final Permutation permutation = new Permutation(coeff_length, random);
         
-        Log.d(Jpeg.LOG, coeff.length + " indices shuffled");
+        Log.d(Jpeg.LOG, coeff_length + " indices shuffled");
         int extractedByte = 0;
         int availableExtractedBits = 0;
         int extractedFileLength = 0;
@@ -84,13 +85,13 @@ public class Extract {
                 continue; // skip DC coefficients
             }
             shuffledIndex = shuffledIndex - shuffledIndex % 64 + deZigZag[shuffledIndex % 64];
-            if (coeff[shuffledIndex] == 0) {
+            if (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) == 0) {
                 continue; // skip zeroes
             }
-            if (coeff[shuffledIndex] > 0) {
-                extractedBit = coeff[shuffledIndex] & 1;
+            if (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) > 0) {
+                extractedBit = hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) & 1;
             } else {
-                extractedBit = 1 - (coeff[shuffledIndex] & 1);
+                extractedBit = 1 - (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) & 1);
             }
             extractedFileLength |= extractedBit << availableExtractedBits++;
         }
@@ -117,7 +118,7 @@ public class Extract {
                 int code = 1;
                 for (i = 0; code <= n; i++) {
                     // check for pending end of coeff
-                    if (startOfN + i >= coeff.length) {
+                    if (startOfN + i >= coeff_length) {
                         break extractingLoop;
                     }
                     shuffledIndex = permutation.getShuffled(startOfN + i);
@@ -125,13 +126,13 @@ public class Extract {
                         continue; // skip DC coefficients
                     }
                     shuffledIndex = shuffledIndex - shuffledIndex % 64 + deZigZag[shuffledIndex % 64];
-                    if (coeff[shuffledIndex] == 0) {
+                    if (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) == 0) {
                         continue; // skip zeroes
                     }
-                    if (coeff[shuffledIndex] > 0) {
-                        extractedBit = coeff[shuffledIndex] & 1;
+                    if (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) > 0) {
+                        extractedBit = hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) & 1;
                     } else {
-                        extractedBit = 1 - (coeff[shuffledIndex] & 1);
+                        extractedBit = 1 - (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) & 1);
                     }
                     if (extractedBit == 1) {
                         hash ^= code;
@@ -158,19 +159,19 @@ public class Extract {
             } while (true);
         } else {
         	Log.d(Jpeg.LOG, "Default code used");
-            for (; i < coeff.length; i++) {
+            for (; i < coeff_length; i++) {
                 shuffledIndex = permutation.getShuffled(i);
                 if (shuffledIndex % 64 == 0) {
                     continue; // skip DC coefficients
                 }
                 shuffledIndex = shuffledIndex - shuffledIndex % 64 + deZigZag[shuffledIndex % 64];
-                if (coeff[shuffledIndex] == 0) {
+                if (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) == 0) {
                     continue; // skip zeroes
                 }
-                if (coeff[shuffledIndex] > 0) {
-                    extractedBit = coeff[shuffledIndex] & 1;
+                if (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) > 0) {
+                    extractedBit = hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) & 1;
                 } else {
-                    extractedBit = 1 - (coeff[shuffledIndex] & 1);
+                    extractedBit = 1 - (hd.f5.getHuffmanDecodeBufferValue(shuffledIndex) & 1);
                 }
                 extractedByte |= extractedBit << availableExtractedBits++;
                 if (availableExtractedBits == 8) {
@@ -193,6 +194,10 @@ public class Extract {
         } else {
         	((ExtractionListener) a).onExtractionResult(fos);
         }
+        
+        hd.f5.cleanUpHuffmanBuffer();
+        hd.f5.cleanUpHuffmanDecodeBuffer();
+        
     }
 
 }

@@ -93,11 +93,15 @@ public class JpegEncoder {
         WriteEOI(this.outStream);
         try {
             this.outStream.flush();
+            this.JpegObj.f5.cleanUpCoeffs();
+            this.JpegObj.f5.cleanUpImage();
             return true;
         } catch (final IOException e) {
             Log.e(Jpeg.LOG, "IO Error: " + e.getMessage());
         }
         
+        this.JpegObj.f5.cleanUpCoeffs();
+        this.JpegObj.f5.cleanUpImage();
         return false;
     }
 
@@ -130,7 +134,6 @@ public class JpegEncoder {
         int i, j, r, c, a, b;
         final int temp = 0;
         int comp, xpos, ypos, xblockoffset, yblockoffset;
-        float inputArray[][];
         final float dctArray1[][] = new float[8][8];
         double dctArray2[][] = new double[8][8];
         int dctArray3[] = new int[8 * 8];
@@ -172,10 +175,11 @@ public class JpegEncoder {
                 }
             }
         }
-        final int coeff[] = new int[coeffCount];
+        this.JpegObj.f5.initF5Coeffs(coeffCount);
 
         Log.d(Jpeg.LOG, "DCT/quantisation starts");
         Log.d(Jpeg.LOG, this.imageWidth + " x " + this.imageHeight);
+        
         for (r = 0; r < MinBlockHeight; r++) {
             for (c = 0; c < MinBlockWidth; c++) {
                 xpos = c * 8;
@@ -183,7 +187,9 @@ public class JpegEncoder {
                 for (comp = 0; comp < this.JpegObj.NumberOfComponents; comp++) {
                     Width = this.JpegObj.BlockWidth[comp];
                     Height = this.JpegObj.BlockHeight[comp];
-                    inputArray = (float[][]) this.JpegObj.Components[comp];
+                    
+                    // XXX: get input arrays from JNI
+                    //inputArray = (float[][]) this.JpegObj.Components[comp];
 
                     for (i = 0; i < this.JpegObj.VsampFactor[comp]; i++) {
                         for (j = 0; j < this.JpegObj.HsampFactor[comp]; j++) {
@@ -212,7 +218,21 @@ public class JpegEncoder {
                                     // dctArray1[a][b] = inputArray[ypos +
                                     // yblockoffset + a][xpos + xblockoffset +
                                     // b];
-                                    dctArray1[a][b] = inputArray[ia][ib];
+                                    
+                                    //dctArray1[a][b] = inputArray[ia][ib];
+                                    
+                                    // XXX: this is how we get the value from JNI
+                                    switch(comp) {
+                                    case 0:
+                                    	dctArray1[a][b] = this.JpegObj.f5.getYValue(ia, ib);
+                                    	break;
+                                    case 1:
+                                    	dctArray1[a][b] = this.JpegObj.f5.getCb2Value(ia, ib);
+                                    	break;
+                                    case 2:
+                                    	dctArray1[a][b] = this.JpegObj.f5.getCr2Value(ia, ib);
+                                    	break;
+                                    }
                                 }
                             }
                             // The following code commented out because on some
@@ -221,8 +241,23 @@ public class JpegEncoder {
                             // if ((!JpegObj.lastColumnIsDummy[comp] || c <
                             // Width - 1) && (!JpegObj.lastRowIsDummy[comp] || r
                             // < Height - 1)) {
+                            
+                            
+                            
                             dctArray2 = this.dct.forwardDCT(dctArray1);
+                            /*
+                            for(int dcta2=0; dcta2<dctArray2.length; dcta2++) {
+                            	double[] dd = dctArray2[dcta2];
+                            	for(int dcta2_=0; dcta2_<dd.length; dcta2_++)
+                            		Log.d(Jpeg.LOG, "dctArray2[" + dcta2 + "][" + dcta2_ + "] = " +  dctArray2[dcta2][dcta2_]);
+                            }
+                            */
                             dctArray3 = this.dct.quantizeBlock(dctArray2, this.JpegObj.QtableNumber[comp]);
+                            /*
+                            for(int dcta3=0; dcta3<dctArray3.length; dcta3++) {
+                            	Log.d(Jpeg.LOG, "dctArray3[" + dcta3 + "] = " + dctArray3[dcta3]);
+                            }
+                            */
                             // }
                             // else {
                             // zeroArray[0] = dctArray3[0];
@@ -235,7 +270,18 @@ public class JpegEncoder {
                             // coeff[] first. We do not encode
                             // any Huffman Blocks here (we'll do
                             // this later).
-                            System.arraycopy(dctArray3, 0, coeff, shuffledIndex, 64);
+                            
+                            // public static void arraycopy (Object src, int srcPos, Object dst, int dstPos, int length)
+                            // Copies length elements from the array src, 
+                            // starting at offset srcPos, into the array dst, 
+                            // starting at offset dstPos.
+                            
+                            //System.arraycopy(dctArray3, 0, coeff, shuffledIndex, 64);
+                            int[] coeff = new int[64];
+                            System.arraycopy(dctArray3, 0, coeff, 0, 64);
+                            
+                            this.JpegObj.f5.setCoeffValues(coeff, shuffledIndex);
+                            Log.d(Jpeg.LOG, "last java: " + dctArray3[dctArray3.length - 1] + "\nlast c++: " + this.JpegObj.f5.getCoeffValue(shuffledIndex + (dctArray3.length - 1)));
                             shuffledIndex += 64;
 
                         }
@@ -243,6 +289,7 @@ public class JpegEncoder {
                 }
             }
         }
+        
         Log.d(Jpeg.LOG, "got " + coeffCount + " DCT AC/DC coefficients");
         int _changed = 0;
         int _embedded = 0;
@@ -256,13 +303,13 @@ public class JpegEncoder {
             if (i % 64 == 0) {
                 continue;
             }
-            if (coeff[i] == 1) {
+            if (this.JpegObj.f5.getCoeffValue(i) == 1) {
                 _one++;
             }
-            if (coeff[i] == -1) {
+            if (this.JpegObj.f5.getCoeffValue(i) == -1) {
                 _one++;
             }
-            if (coeff[i] == 0) {
+            if (this.JpegObj.f5.getCoeffValue(i) == 0) {
                 _zero++;
             }
         }
@@ -375,21 +422,21 @@ public class JpegEncoder {
                     if (shuffledIndex % 64 == 0) {
                         continue; // skip DC coefficients
                     }
-                    if (coeff[shuffledIndex] == 0) {
+                    if (this.JpegObj.f5.getCoeffValue(shuffledIndex) == 0) {
                         continue; // skip zeroes
                     }
-                    if (coeff[shuffledIndex] > 0) {
-                        if ((coeff[shuffledIndex] & 1) != nextBitToEmbed) {
-                            coeff[shuffledIndex]--; // decrease absolute value
+                    if (this.JpegObj.f5.getCoeffValue(shuffledIndex) > 0) {
+                        if ((this.JpegObj.f5.getCoeffValue(shuffledIndex) & 1) != nextBitToEmbed) {
+                        	this.JpegObj.f5.setCoeffValues(new int[] { this.JpegObj.f5.getCoeffValue(shuffledIndex) - 1}, shuffledIndex);
                             _changed++;
                         }
                     } else {
-                        if ((coeff[shuffledIndex] & 1) == nextBitToEmbed) {
-                            coeff[shuffledIndex]++; // decrease absolute value
+                        if ((this.JpegObj.f5.getCoeffValue(shuffledIndex) & 1) == nextBitToEmbed) {
+                        	this.JpegObj.f5.setCoeffValues(new int[] { this.JpegObj.f5.getCoeffValue(shuffledIndex) + 1}, shuffledIndex);
                             _changed++;
                         }
                     }
-                    if (coeff[shuffledIndex] != 0) {
+                    if (this.JpegObj.f5.getCoeffValue(shuffledIndex) != 0) {
                         // The coefficient is still nonzero. We
                         // successfully embedded "nextBitToEmbed".
                         // We will read a new bit to embed now.
@@ -448,7 +495,7 @@ public class JpegEncoder {
                             if (shuffledIndex % 64 == 0) {
                                 continue; // skip DC coefficients
                             }
-                            if (coeff[shuffledIndex] == 0) {
+                            if (this.JpegObj.f5.getCoeffValue(shuffledIndex) == 0) {
                                 continue; // skip zeroes
                             }
                             codeWord[i++] = shuffledIndex;
@@ -456,10 +503,10 @@ public class JpegEncoder {
                         endOfN = j;
                         hash = 0;
                         for (i = 0; i < this.n; i++) {
-                            if (coeff[codeWord[i]] > 0) {
-                                extractedBit = coeff[codeWord[i]] & 1;
+                            if (this.JpegObj.f5.getCoeffValue(codeWord[i]) > 0) {
+                                extractedBit = this.JpegObj.f5.getCoeffValue(codeWord[i]) & 1;
                             } else {
-                                extractedBit = 1 - (coeff[codeWord[i]] & 1);
+                                extractedBit = 1 - (this.JpegObj.f5.getCoeffValue(codeWord[i]) & 1);
                             }
                             if (extractedBit == 1) {
                                 hash ^= i + 1;
@@ -470,16 +517,16 @@ public class JpegEncoder {
                             break; // embedded without change
                         }
                         i--;
-                        if (coeff[codeWord[i]] > 0) {
-                            coeff[codeWord[i]]--;
+                        if (this.JpegObj.f5.getCoeffValue(codeWord[i]) > 0) {
+                        	this.JpegObj.f5.setCoeffValues(new int[] { this.JpegObj.f5.getCoeffValue(codeWord[i]) - 1}, codeWord[i]);
                         } else {
-                            coeff[codeWord[i]]++;
+                        	this.JpegObj.f5.setCoeffValues(new int[] { this.JpegObj.f5.getCoeffValue(codeWord[i]) + 1}, codeWord[i]);
                         }
                         _changed++;
-                        if (coeff[codeWord[i]] == 0) {
+                        if (this.JpegObj.f5.getCoeffValue(codeWord[i]) == 0) {
                             _thrown++;
                         }
-                    } while (coeff[codeWord[i]] == 0);
+                    } while (this.JpegObj.f5.getCoeffValue(codeWord[i]) == 0);
                     startOfN = endOfN;
                 } while (!isLastByte);
             } else { // default code
@@ -490,22 +537,22 @@ public class JpegEncoder {
                     if (shuffledIndex % 64 == 0) {
                         continue; // skip DC coefficients
                     }
-                    if (coeff[shuffledIndex] == 0) {
+                    if (this.JpegObj.f5.getCoeffValue(shuffledIndex) == 0) {
                         continue; // skip zeroes
                     }
                     _examined++;
-                    if (coeff[shuffledIndex] > 0) {
-                        if ((coeff[shuffledIndex] & 1) != nextBitToEmbed) {
-                            coeff[shuffledIndex]--; // decrease absolute value
+                    if (this.JpegObj.f5.getCoeffValue(shuffledIndex) > 0) {
+                        if ((this.JpegObj.f5.getCoeffValue(shuffledIndex) & 1) != nextBitToEmbed) {
+                        	this.JpegObj.f5.setCoeffValues(new int[] { this.JpegObj.f5.getCoeffValue(shuffledIndex) - 1}, shuffledIndex);
                             _changed++;
                         }
                     } else {
-                        if ((coeff[shuffledIndex] & 1) == nextBitToEmbed) {
-                            coeff[shuffledIndex]++; // decrease absolute value
+                        if ((this.JpegObj.f5.getCoeffValue(shuffledIndex) & 1) == nextBitToEmbed) {
+                        	this.JpegObj.f5.setCoeffValues(new int[] { this.JpegObj.f5.getCoeffValue(shuffledIndex) + 1}, shuffledIndex);
                             _changed++;
                         }
                     }
-                    if (coeff[shuffledIndex] != 0) {
+                    if (this.JpegObj.f5.getCoeffValue(shuffledIndex) != 0) {
                         // The coefficient is still nonzero. We
                         // successfully embedded "nextBitToEmbed".
                         // We will read a new bit to embed now.
@@ -549,7 +596,9 @@ public class JpegEncoder {
                 for (comp = 0; comp < this.JpegObj.NumberOfComponents; comp++) {
                     for (i = 0; i < this.JpegObj.VsampFactor[comp]; i++) {
                         for (j = 0; j < this.JpegObj.HsampFactor[comp]; j++) {
-                            System.arraycopy(coeff, shuffledIndex, dctArray3, 0, 64);
+                        	for(int c_=0; c_<64; c_++)
+                        		dctArray3[c_] = this.JpegObj.f5.getCoeffValue(shuffledIndex + c_);
+                        	
                             this.Huf.HuffmanBlockEncoder(outStream, dctArray3, lastDCvalue[comp],
                                     this.JpegObj.DCtableNumber[comp], this.JpegObj.ACtableNumber[comp]);
                             lastDCvalue[comp] = dctArray3[0];

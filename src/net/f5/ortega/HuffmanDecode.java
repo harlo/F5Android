@@ -33,6 +33,8 @@ package net.f5.ortega;
 // constructor changed to byte array parameter
 // added method rawDecode
 //
+import info.guardianproject.f5android.F5Buffers;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -202,6 +204,8 @@ public class HuffmanDecode {
     DataInputStream dis;
 
     Date dt;
+    
+    public F5Buffers f5 = new F5Buffers();
 
     // }}
 
@@ -273,7 +277,7 @@ public class HuffmanDecode {
     }
 
     // Return image data
-    public int[] decode() {
+    public int decode() {
         final int x, y, a, b, line;// , sz = X * Y;
         int /* col, */tmp;
         final int blocks, MCU;// , scan=0;
@@ -310,7 +314,8 @@ public class HuffmanDecode {
 
         // Calculate the Number of blocks encoded
         // warum doppelt so viel?
-        final int buff[] = new int[2 * 8 * 8 * getBlockCount()];
+        //final int buff[] = new int[2 * 8 * 8 * getBlockCount()];
+        this.f5.initF5HuffmanBuffer(2 * 8 * 8 * getBlockCount());
         int pos = 0;
         int MCUCount = 0;
 
@@ -335,7 +340,9 @@ public class HuffmanDecode {
                         // System.out.println("pos="+pos);
                         // Zickzack???
                         // buff[pos++]=ZZ[deZigZag[lp]];
-                        buff[pos++] = this.ZZ[this.lp];
+                    	this.f5.setHuffmanBufferValues(new int[] {this.ZZ[this.lp]}, pos);
+                    	pos++;
+                        //buff[pos++] = this.ZZ[this.lp];
                     }
                 }
             }
@@ -373,9 +380,14 @@ public class HuffmanDecode {
                 break;
             }
         }
+        
+        /*
         final int[] tmpBuff = new int[pos];
         System.arraycopy(buff, 0, tmpBuff, 0, pos);
         return tmpBuff;
+        */
+        f5.setHuffmanDecodeBuffer(pos, 0);
+        return pos;
     }
 
     private int DECODE() {

@@ -5,6 +5,18 @@
 #include <android/log.h>
 #include <string.h>
 
+class F5HuffmanDecodeBuffer
+{
+public:
+	int* buffer;
+
+	F5HuffmanDecodeBuffer() {};
+	F5HuffmanDecodeBuffer(int hb_size) {
+		this->buffer = new int[hb_size];
+	}
+	~F5HuffmanDecodeBuffer() {};
+};
+
 class F5HuffmanBuffer
 {
 public:
@@ -103,6 +115,13 @@ JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuff
 {
 	F5HuffmanBuffer* f5 = new F5HuffmanBuffer(hb_size);
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5HuffmanBuffer));
+}
+
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuffmanDecodeBuffer
+  (JNIEnv *env, jobject obj, int hdb_size)
+{
+	F5HuffmanDecodeBuffer* f5 = new F5HuffmanDecodeBuffer(hdb_size);
+	return env->NewDirectByteBuffer((void*) f5, sizeof(F5HuffmanDecodeBuffer));
 }
 
 JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPixelValues
@@ -240,6 +259,25 @@ JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanB
 	return f5->buffer[pos];
 }
 
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setHuffmanDecodeBufferValues
+  (JNIEnv *env, jobject obj, jobject hdb_pntr, jobject hb_pntr, int v_len, int start)
+{
+	F5HuffmanBuffer* f5 = (F5HuffmanBuffer*) env->GetDirectBufferAddress(hb_pntr);
+	F5HuffmanDecodeBuffer* f5_ = (F5HuffmanDecodeBuffer*) env->GetDirectBufferAddress(hdb_pntr);
+
+	int p=0;
+	for(; p<v_len; p++) {
+		f5_->buffer[p + start] = f5->buffer[p + start];
+	}
+}
+
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanDecodeBufferValue
+  (JNIEnv *env, jobject obj, jobject pntr, int pos)
+{
+	F5HuffmanDecodeBuffer* f5 = (F5HuffmanDecodeBuffer*) env->GetDirectBufferAddress(pntr);
+	return f5->buffer[pos];
+}
+
 JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpImage
 (JNIEnv *env, jobject obj, jobject pntr)
 {
@@ -261,3 +299,9 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuff
 	delete(f5);
 }
 
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuffmanDecodeBuffer
+(JNIEnv *env, jobject obj, jobject pntr)
+{
+	F5HuffmanDecodeBuffer* f5 = (F5HuffmanDecodeBuffer*) env->GetDirectBufferAddress(pntr);
+	delete(f5);
+}

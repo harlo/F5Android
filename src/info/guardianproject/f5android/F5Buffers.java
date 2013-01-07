@@ -6,41 +6,44 @@ import android.util.Log;
 
 public class F5Buffers {
 	public final static String LOG = "************** PK JNI WRAPPER **************";
-	private ByteBuffer f5, coeffs, buffer;
+	private ByteBuffer f5, coeffs, buffer, decode_buffer;
 	
-	public native ByteBuffer initImage(int[] dimensions, int[] compWidth, int[] compHeight);
-	public native ByteBuffer initCoeffs(int size);
-	public native ByteBuffer initHuffmanBuffer(int size);
+	private native ByteBuffer initImage(int[] dimensions, int[] compWidth, int[] compHeight);
+	private native ByteBuffer initCoeffs(int size);
+	private native ByteBuffer initHuffmanBuffer(int size);
+	private native ByteBuffer initHuffmanDecodeBuffer(int size);
 	
-	public native void setPixelValues(ByteBuffer f5_pointer, int[] values, int v_len, int start);
-	public native int getPixelValue(ByteBuffer f5_pointer, int pos);
+	private native void setPixelValues(ByteBuffer f5_pointer, int[] values, int v_len, int start);
+	private native int getPixelValue(ByteBuffer f5_pointer, int pos);
 	
-	public native void setYValues(ByteBuffer f5_pointer, float values, int x, int y);
-	public native float getYValue(ByteBuffer f5_pointer, int x, int y);
+	private native void setYValues(ByteBuffer f5_pointer, float values, int x, int y);
+	private native float getYValue(ByteBuffer f5_pointer, int x, int y);
 	
-	public native void setCr1Values(ByteBuffer f5_pointer, float values, int x, int y);
-	public native float getCr1Value(ByteBuffer f5_pointer, int x, int y);
+	private native void setCr1Values(ByteBuffer f5_pointer, float values, int x, int y);
+	private native float getCr1Value(ByteBuffer f5_pointer, int x, int y);
 	
-	public native void setCb1Values(ByteBuffer f5_pointer, float values, int x, int y);
-	public native float getCb1Value(ByteBuffer f5_pointer, int x, int y);
+	private native void setCb1Values(ByteBuffer f5_pointer, float values, int x, int y);
+	private native float getCb1Value(ByteBuffer f5_pointer, int x, int y);
 	
-	public native void setCr2Values(ByteBuffer f5_pointer, float values, int x, int y);
-	public native float getCr2Value(ByteBuffer f5_pointer, int x, int y);
+	private native void setCr2Values(ByteBuffer f5_pointer, float values, int x, int y);
+	private native float getCr2Value(ByteBuffer f5_pointer, int x, int y);
 	
-	public native void setCb2Values(ByteBuffer f5_pointer, float values, int x, int y);
-	public native float getCb2Value(ByteBuffer f5_pointer, int x, int y);
+	private native void setCb2Values(ByteBuffer f5_pointer, float values, int x, int y);
+	private native float getCb2Value(ByteBuffer f5_pointer, int x, int y);
 	
+	private native void setCoeffValues(ByteBuffer coeffs_pointer, int[] values, int v_len, int start);
+	private native int getCoeffValue(ByteBuffer coeffs_pointer, int pos);
 	
-	public native void setCoeffValues(ByteBuffer coeffs_pointer, int[] values, int v_len, int start);
-	public native int getCoeffValue(ByteBuffer coeffs_pointer, int pos);
+	private native void setHuffmanBufferValues(ByteBuffer hb_pointer, int[] values, int v_len, int start);
+	private native int getHuffmanBufferValue(ByteBuffer hb_pointer, int pos);
 	
+	private native void setHuffmanDecodeBufferValues(ByteBuffer hdb_pointer, ByteBuffer hb_pointer, int v_len, int start);
+	private native int getHuffmanDecodeBufferValue(ByteBuffer hdb_pointer, int pos);
 	
-	public native void setHuffmanBufferValues(ByteBuffer hb_pointer, int[] values, int v_len, int start);
-	public native int getHuffmanBufferValue(ByteBuffer hb_pointer, int pos);
-	
-	public native void cleanUpImage(ByteBuffer f5_pointer);
-	public native void cleanUpCoeffs(ByteBuffer coeffs_pointer);
-	public native void cleanUpHuffmanBuffer(ByteBuffer hb_pointer);
+	private native void cleanUpImage(ByteBuffer f5_pointer);
+	private native void cleanUpCoeffs(ByteBuffer coeffs_pointer);
+	private native void cleanUpHuffmanBuffer(ByteBuffer hb_pointer);
+	private native void cleanUpHuffmanDecodeBuffer(ByteBuffer hdb_pointer);
 	
 	static {
 		System.loadLibrary("F5Buffers");
@@ -143,6 +146,16 @@ public class F5Buffers {
 		return getHuffmanBufferValue(buffer, pos);
 	}
 	
+	public void setHuffmanDecodeBuffer(int v_len, int start) {
+		Log.d(LOG, "well, this subarray is large: " + v_len);
+		decode_buffer = this.initHuffmanDecodeBuffer(v_len);
+		this.setHuffmanDecodeBufferValues(decode_buffer, buffer, v_len, start);
+	}
+	
+	public int getHuffmanDecodeBufferValue(int pos) {
+		return getHuffmanDecodeBufferValue(decode_buffer, pos);
+	}
+	
 	public void cleanUpImage() {
 		Log.d(LOG, "cleanup image");
 		cleanUpImage(f5);
@@ -154,7 +167,12 @@ public class F5Buffers {
 	}
 	
 	public void cleanUpHuffmanBuffer() {
-		Log.d(LOG, "cleanup image");
+		Log.d(LOG, "cleanup huffman buffer");
 		cleanUpHuffmanBuffer(buffer);
+	}
+	
+	public void cleanUpHuffmanDecodeBuffer() {
+		Log.d(LOG, "cleanup decode buffer");
+		cleanUpHuffmanDecodeBuffer(decode_buffer);
 	}
 }
