@@ -2,16 +2,19 @@ package info.guardianproject.f5android;
 
 import java.nio.ByteBuffer;
 
+import android.app.Activity;
 import android.util.Log;
 
 public class F5Buffers {
 	public final static String LOG = "************** PK JNI WRAPPER **************";
-	private ByteBuffer f5, coeffs, buffer, decode_buffer;
+	private Activity a;
+	private ByteBuffer f5, coeffs, buffer, decode_buffer, permutation;
 	
 	private native ByteBuffer initImage(int[] dimensions, int[] compWidth, int[] compHeight);
 	private native ByteBuffer initCoeffs(int size);
 	private native ByteBuffer initHuffmanBuffer(int size);
 	private native ByteBuffer initHuffmanDecodeBuffer(int size);
+	private native ByteBuffer initPermutation(int size);
 	
 	private native void setPixelValues(ByteBuffer f5_pointer, int[] values, int v_len, int start);
 	private native int getPixelValue(ByteBuffer f5_pointer, int pos);
@@ -40,30 +43,51 @@ public class F5Buffers {
 	private native void setHuffmanDecodeBufferValues(ByteBuffer hdb_pointer, ByteBuffer hb_pointer, int v_len, int start);
 	private native int getHuffmanDecodeBufferValue(ByteBuffer hdb_pointer, int pos);
 	
+	private native void setPermutationValues(ByteBuffer p_pointer, int[] values, int v_len, int start);
+	private native int getPermutationValue(ByteBuffer p_pointer, int pos);
+	
+	
 	private native void cleanUpImage(ByteBuffer f5_pointer);
 	private native void cleanUpCoeffs(ByteBuffer coeffs_pointer);
 	private native void cleanUpHuffmanBuffer(ByteBuffer hb_pointer);
 	private native void cleanUpHuffmanDecodeBuffer(ByteBuffer hdb_pointer);
+	private native void cleanUpPermutation(ByteBuffer p_pointer);
 	
 	static {
 		System.loadLibrary("F5Buffers");
 	}
 	
-	public F5Buffers() {}
+	public interface F5Notification {
+		public void onUpdate();
+		public void onFailure();
+	}
+	
+	public F5Buffers(Activity a) {
+		this.a = a;
+	}
 	
 	public void initF5Image(int[] dimensions, int[] compWidth, int[] compHeight) {
 		Log.d(LOG, "initImage");
 		f5 = initImage(dimensions, compWidth, compHeight);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public void initF5Coeffs(int size) {
 		Log.d(LOG, "initCoeffs");
 		coeffs = initCoeffs(size);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public void initF5HuffmanBuffer(int size) {
 		Log.d(LOG, "initHuffmanBuffer");
 		buffer = initHuffmanBuffer(size);
+		((F5Notification) a).onUpdate();
+	}
+	
+	public void initF5Permutation(int size) {
+		Log.d(LOG, "initPermutation");
+		permutation = initPermutation(size);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public void setPixelValues(int[] values, int start) {
@@ -150,29 +174,48 @@ public class F5Buffers {
 		Log.d(LOG, "well, this subarray is large: " + v_len);
 		decode_buffer = this.initHuffmanDecodeBuffer(v_len);
 		this.setHuffmanDecodeBufferValues(decode_buffer, buffer, v_len, start);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public int getHuffmanDecodeBufferValue(int pos) {
 		return getHuffmanDecodeBufferValue(decode_buffer, pos);
 	}
 	
+	public void setPermutationValues(int[] values, int start) {
+		this.setPermutationValues(permutation, values, values.length, start);
+	}
+	
+	public int getPermutationValues(int pos) {
+		return getPermutationValue(permutation, pos);
+	}
+	
 	public void cleanUpImage() {
 		Log.d(LOG, "cleanup image");
 		cleanUpImage(f5);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public void cleanUpCoeffs() {
 		Log.d(LOG, "cleanup coeffs");
 		cleanUpCoeffs(coeffs);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public void cleanUpHuffmanBuffer() {
 		Log.d(LOG, "cleanup huffman buffer");
 		cleanUpHuffmanBuffer(buffer);
+		((F5Notification) a).onUpdate();
 	}
 	
 	public void cleanUpHuffmanDecodeBuffer() {
 		Log.d(LOG, "cleanup decode buffer");
 		cleanUpHuffmanDecodeBuffer(decode_buffer);
+		((F5Notification) a).onUpdate();
+	}
+	
+	public void cleanUpPermutation() {
+		Log.d(LOG, "cleanup permutation buffer");
+		cleanUpPermutation(permutation);
+		((F5Notification) a).onUpdate();
 	}
 }

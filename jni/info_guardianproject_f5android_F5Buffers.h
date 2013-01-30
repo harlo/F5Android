@@ -41,6 +41,14 @@ JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuff
 
 /*
  * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    initPermutation
+ * Signature: (I)Ljava/nio/ByteBuffer;
+ */
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initPermutation
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
  * Method:    setPixelValues
  * Signature: (Ljava/nio/ByteBuffer;[III)V
  */
@@ -185,6 +193,22 @@ JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanD
 
 /*
  * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    setPermutationValues
+ * Signature: (Ljava/nio/ByteBuffer;[III)V
+ */
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPermutationValues
+  (JNIEnv *, jobject, jobject, jintArray, jint, jint);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    getPermutationValue
+ * Signature: (Ljava/nio/ByteBuffer;I)I
+ */
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getPermutationValue
+  (JNIEnv *, jobject, jobject, jint);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
  * Method:    cleanUpImage
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
@@ -213,6 +237,14 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuff
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
 JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuffmanDecodeBuffer
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     info_guardianproject_f5android_F5Buffers
+ * Method:    cleanUpPermutation
+ * Signature: (Ljava/nio/ByteBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpPermutation
   (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus

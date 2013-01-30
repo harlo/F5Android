@@ -88,7 +88,7 @@ public class Jpeg {
 			
 			//image = BitmapFactory.decodeFile(in_file_name, opts);
 			image = BitmapFactory.decodeFile(in_file_name);
-			jpg = new JpegEncoder(image, Quality, dataOut, "");
+			jpg = new JpegEncoder(a, image, Quality, dataOut, "");
 			
 		} else {
 			// TODO: could not find the in file-- throw error

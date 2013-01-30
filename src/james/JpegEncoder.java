@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -63,7 +64,7 @@ public class JpegEncoder {
 
     int n = 0;
 
-    public JpegEncoder(final Bitmap image, final int quality, final OutputStream out, final String comment) {
+    public JpegEncoder(final Activity a, final Bitmap image, final int quality, final OutputStream out, final String comment) {
         /*
          * Quality of the image. 0 to 100 and from bad image quality, high
          * compression to good image quality low compression
@@ -74,7 +75,7 @@ public class JpegEncoder {
          * Getting picture information It takes the Width, Height and RGB scans
          * of the image.
          */
-        this.JpegObj = new JpegInfo(image, comment);
+        this.JpegObj = new JpegInfo(a, image, comment);
 
         this.imageHeight = this.JpegObj.imageHeight;
         this.imageWidth = this.JpegObj.imageWidth;
@@ -95,6 +96,7 @@ public class JpegEncoder {
             this.outStream.flush();
             this.JpegObj.f5.cleanUpCoeffs();
             this.JpegObj.f5.cleanUpImage();
+            this.JpegObj.f5.cleanUpPermutation();
             return true;
         } catch (final IOException e) {
             Log.e(Jpeg.LOG, "IO Error: " + e.getMessage());
@@ -102,6 +104,7 @@ public class JpegEncoder {
         
         this.JpegObj.f5.cleanUpCoeffs();
         this.JpegObj.f5.cleanUpImage();
+        this.JpegObj.f5.cleanUpPermutation();
         return false;
     }
 
@@ -245,19 +248,8 @@ public class JpegEncoder {
                             
                             
                             dctArray2 = this.dct.forwardDCT(dctArray1);
-                            /*
-                            for(int dcta2=0; dcta2<dctArray2.length; dcta2++) {
-                            	double[] dd = dctArray2[dcta2];
-                            	for(int dcta2_=0; dcta2_<dd.length; dcta2_++)
-                            		Log.d(Jpeg.LOG, "dctArray2[" + dcta2 + "][" + dcta2_ + "] = " +  dctArray2[dcta2][dcta2_]);
-                            }
-                            */
                             dctArray3 = this.dct.quantizeBlock(dctArray2, this.JpegObj.QtableNumber[comp]);
-                            /*
-                            for(int dcta3=0; dcta3<dctArray3.length; dcta3++) {
-                            	Log.d(Jpeg.LOG, "dctArray3[" + dcta3 + "] = " + dctArray3[dcta3]);
-                            }
-                            */
+                            
                             // }
                             // else {
                             // zeroArray[0] = dctArray3[0];
@@ -281,7 +273,6 @@ public class JpegEncoder {
                             System.arraycopy(dctArray3, 0, coeff, 0, 64);
                             
                             this.JpegObj.f5.setCoeffValues(coeff, shuffledIndex);
-                            Log.d(Jpeg.LOG, "last java: " + dctArray3[dctArray3.length - 1] + "\nlast c++: " + this.JpegObj.f5.getCoeffValue(shuffledIndex + (dctArray3.length - 1)));
                             shuffledIndex += 64;
 
                         }
@@ -350,7 +341,7 @@ public class JpegEncoder {
             // Now we embed the secret data in the permutated sequence.
         	Log.d(Jpeg.LOG, "Permutation starts");
             final F5Random random = new F5Random();
-            final Permutation permutation = new Permutation(coeffCount, random);
+            final Permutation permutation = new Permutation(coeffCount, random, this.JpegObj.f5);
             int nextBitToEmbed = 0;
             int byteToEmbed = 0;
             int availableBitsToEmbed = 0;

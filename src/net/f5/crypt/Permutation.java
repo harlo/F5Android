@@ -1,31 +1,34 @@
 package net.f5.crypt;
 
-public class Permutation {
-    int[] shuffled; // shuffled sequence
+import info.guardianproject.f5android.F5Buffers;
 
+public class Permutation {
     // The constructor of class Permutation creates a shuffled
     // sequence of the integers 0 ... (size-1).
-    public Permutation(final int size, final F5Random random) {
+	F5Buffers f5;
+	
+    public Permutation(final int size, final F5Random random, final F5Buffers f5) {
         int i, randomIndex, tmp;
-        this.shuffled = new int[size];
-
+        this.f5 = f5;
+        this.f5.initF5Permutation(size);
+        
         // To create the shuffled sequence, we initialise an array
         // with the integers 0 ... (size-1).
         for (i = 0; i < size; i++) {
             // initialise with �size� integers
-            this.shuffled[i] = i;
+        	this.f5.setPermutationValues(new int[] {i}, i);
         }
         int maxRandom = size; // set number of entries to shuffle
         for (i = 0; i < size; i++) { // shuffle entries
             randomIndex = random.getNextValue(maxRandom--);
-            tmp = this.shuffled[randomIndex];
-            this.shuffled[randomIndex] = this.shuffled[maxRandom];
-            this.shuffled[maxRandom] = tmp;
+            tmp = this.f5.getPermutationValues(randomIndex);
+            this.f5.setPermutationValues(new int[] { this.f5.getPermutationValues(maxRandom) }, randomIndex);
+            this.f5.setPermutationValues(new int[] { tmp }, maxRandom);
         }
     }
 
     // get value #i from the shuffled sequence
     public int getShuffled(final int i) {
-        return this.shuffled[i];
+        return this.f5.getPermutationValues(i);
     }
 }

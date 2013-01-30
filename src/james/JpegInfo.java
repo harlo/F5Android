@@ -15,6 +15,7 @@
 package james;
 
 import info.guardianproject.f5android.F5Buffers;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -82,9 +83,10 @@ class JpegInfo {
 
     public int MaxVsampFactor;
     
-    public F5Buffers f5 = new F5Buffers();
+    public F5Buffers f5;
 
-    public JpegInfo(final Bitmap image, final String comment) {
+    public JpegInfo(Activity a, final Bitmap image, final String comment) {
+    	f5 = new F5Buffers(a);
         this.Components = new Object[this.NumberOfComponents];
         this.compWidth = new int[this.NumberOfComponents];
         this.compHeight = new int[this.NumberOfComponents];
@@ -223,10 +225,6 @@ class JpegInfo {
         	imageobj.getPixels(values, 0, this.imageWidth, 0, i, this.imageWidth, 1);
         	
         	this.f5.setPixelValues(values, current);
-
-        	// XXX: CHECK?
-        	Log.d(Jpeg.LOG, "Pixel Value\nlast java: " + values[values.length - 1] + "\nlast c++: " + this.f5.getPixelValue((current + this.imageWidth) -1));
-        	
         	current += this.imageWidth;
         }
         

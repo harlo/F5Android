@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import android.app.Activity;
 import android.util.Log;
@@ -59,14 +58,14 @@ public class Extract {
             throws IOException {
         carrier = new byte[flength];
         fis.read(carrier);
-        final HuffmanDecode hd = new HuffmanDecode(carrier);
+        final HuffmanDecode hd = new HuffmanDecode(a, carrier);
         Log.d(Jpeg.LOG, "Huffman decoding starts");
         //coeff = hd.decode();
         int coeff_length = hd.decode();
         
         Log.d(Jpeg.LOG, "Permutation starts");
         final F5Random random = new F5Random();
-        final Permutation permutation = new Permutation(coeff_length, random);
+        final Permutation permutation = new Permutation(coeff_length, random, hd.f5);
         
         Log.d(Jpeg.LOG, coeff_length + " indices shuffled");
         int extractedByte = 0;

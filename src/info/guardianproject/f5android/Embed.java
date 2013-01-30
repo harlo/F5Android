@@ -75,7 +75,7 @@ public class Embed {
     		} catch(final IOException e) {}
     		
     		image = BitmapFactory.decodeFile(this.inFileName);
-    		jpg = new JpegEncoder(image, Quality, dataOut, comment);
+    		jpg = new JpegEncoder(a, image, Quality, dataOut, comment);
     		
     		try {
     			if(jpg.Compress(new ByteArrayInputStream(secret_message.getBytes()))) {

@@ -40,6 +40,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import android.app.Activity;
+
 @SuppressWarnings("unused")
 public class HuffmanDecode {
     private final static int APP0 = 0xE0;
@@ -205,12 +207,14 @@ public class HuffmanDecode {
 
     Date dt;
     
-    public F5Buffers f5 = new F5Buffers();
+    public F5Buffers f5;
 
     // }}
 
     // Constructor Method
-    public HuffmanDecode(final byte[] data) {
+    public HuffmanDecode(Activity a, final byte[] data) {
+    	f5 = new F5Buffers(a);
+    	
         this.size = (short) data.length;
         this.dis = new DataInputStream(new ByteArrayInputStream(data));
         // Parse out markers and header info

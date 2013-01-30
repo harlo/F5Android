@@ -5,6 +5,18 @@
 #include <android/log.h>
 #include <string.h>
 
+class F5Permutation
+{
+public:
+	int* buffer;
+
+	F5Permutation() {};
+	F5Permutation(int hb_size) {
+		this->buffer = new int[hb_size];
+	}
+	~F5Permutation() {};
+};
+
 class F5HuffmanDecodeBuffer
 {
 public:
@@ -122,6 +134,13 @@ JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuff
 {
 	F5HuffmanDecodeBuffer* f5 = new F5HuffmanDecodeBuffer(hdb_size);
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5HuffmanDecodeBuffer));
+}
+
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initPermutation
+  (JNIEnv *env, jobject obj, int p_size)
+{
+	F5Permutation* f5 = new F5Permutation(p_size);
+	return env->NewDirectByteBuffer((void*) f5, sizeof(F5Permutation));
 }
 
 JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPixelValues
@@ -278,6 +297,27 @@ JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanD
 	return f5->buffer[pos];
 }
 
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPermutationValues
+  (JNIEnv *env, jobject obj, jobject pntr, jintArray values, int v_len, int start)
+{
+	F5Permutation* f5 = (F5Permutation*) env->GetDirectBufferAddress(pntr);
+	int* values_ = env->GetIntArrayElements(values, NULL);
+
+	int p = 0;
+	for(; p<v_len; p++) {
+		f5->buffer[p + start] = values_[p];
+	}
+
+	env->ReleaseIntArrayElements(values, values_, 0);
+}
+
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getPermutationValue
+  (JNIEnv *env, jobject obj, jobject pntr, int pos)
+{
+	F5Permutation* f5 = (F5Permutation*) env->GetDirectBufferAddress(pntr);
+	return f5->buffer[pos];
+}
+
 JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpImage
 (JNIEnv *env, jobject obj, jobject pntr)
 {
@@ -303,5 +343,12 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuff
 (JNIEnv *env, jobject obj, jobject pntr)
 {
 	F5HuffmanDecodeBuffer* f5 = (F5HuffmanDecodeBuffer*) env->GetDirectBufferAddress(pntr);
+	delete(f5);
+}
+
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpPermutation
+(JNIEnv *env, jobject obj, jobject pntr)
+{
+	F5Permutation* f5 = (F5Permutation*) env->GetDirectBufferAddress(pntr);
 	delete(f5);
 }
