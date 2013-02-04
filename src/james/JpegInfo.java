@@ -15,6 +15,7 @@
 package james;
 
 import info.guardianproject.f5android.F5Buffers;
+import info.guardianproject.f5android.F5Buffers.F5Notification;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -104,6 +105,8 @@ class JpegInfo {
     
     void downsampleCb1(int comp) {
     	Log.d(Jpeg.LOG, "downsampling cb1: ");
+    	f5.update();
+    	
     	int inrow, incol;
         int outrow, outcol;
         float temp;
@@ -129,6 +132,8 @@ class JpegInfo {
     
     void downsampleCr1(int comp) {
     	Log.d(Jpeg.LOG, "downsampling cr1: ");
+    	f5.update();
+    	
     	int inrow, incol;
         int outrow, outcol;
         float temp;

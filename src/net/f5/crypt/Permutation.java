@@ -18,6 +18,9 @@ public class Permutation {
             // initialise with �size� integers
         	this.f5.setPermutationValues(new int[] {i}, i);
         }
+        
+        this.f5.update();
+        
         int maxRandom = size; // set number of entries to shuffle
         for (i = 0; i < size; i++) { // shuffle entries
             randomIndex = random.getNextValue(maxRandom--);
@@ -25,6 +28,8 @@ public class Permutation {
             this.f5.setPermutationValues(new int[] { this.f5.getPermutationValues(maxRandom) }, randomIndex);
             this.f5.setPermutationValues(new int[] { tmp }, maxRandom);
         }
+        
+        this.f5.update();
     }
 
     // get value #i from the shuffled sequence

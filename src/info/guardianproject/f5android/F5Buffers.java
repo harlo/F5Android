@@ -59,6 +59,7 @@ public class F5Buffers {
 	
 	public interface F5Notification {
 		public void onUpdate();
+		public void onUpdate(int steps, int interval);
 		public void onFailure();
 	}
 	
@@ -69,25 +70,25 @@ public class F5Buffers {
 	public void initF5Image(int[] dimensions, int[] compWidth, int[] compHeight) {
 		Log.d(LOG, "initImage");
 		f5 = initImage(dimensions, compWidth, compHeight);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void initF5Coeffs(int size) {
 		Log.d(LOG, "initCoeffs");
 		coeffs = initCoeffs(size);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void initF5HuffmanBuffer(int size) {
 		Log.d(LOG, "initHuffmanBuffer");
 		buffer = initHuffmanBuffer(size);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void initF5Permutation(int size) {
 		Log.d(LOG, "initPermutation");
 		permutation = initPermutation(size);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void setPixelValues(int[] values, int start) {
@@ -97,7 +98,7 @@ public class F5Buffers {
 	
 	public int getPixelValue(int pos) {
 		//Log.d(LOG, "getPixelValues");
-		return getPixelValue(f5, pos);
+		return getPixelValue(f5, pos);		
 	}
 	
 	public void setYValues(float values, int x, int y) {
@@ -167,14 +168,14 @@ public class F5Buffers {
 	
 	public int getHuffmanBufferValue(int pos) {
 		//Log.d(LOG, "getPixelValues");
+		((F5Notification) a).onUpdate();
 		return getHuffmanBufferValue(buffer, pos);
 	}
 	
 	public void setHuffmanDecodeBuffer(int v_len, int start) {
-		Log.d(LOG, "well, this subarray is large: " + v_len);
 		decode_buffer = this.initHuffmanDecodeBuffer(v_len);
 		this.setHuffmanDecodeBufferValues(decode_buffer, buffer, v_len, start);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public int getHuffmanDecodeBufferValue(int pos) {
@@ -192,30 +193,34 @@ public class F5Buffers {
 	public void cleanUpImage() {
 		Log.d(LOG, "cleanup image");
 		cleanUpImage(f5);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void cleanUpCoeffs() {
 		Log.d(LOG, "cleanup coeffs");
 		cleanUpCoeffs(coeffs);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void cleanUpHuffmanBuffer() {
 		Log.d(LOG, "cleanup huffman buffer");
 		cleanUpHuffmanBuffer(buffer);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void cleanUpHuffmanDecodeBuffer() {
 		Log.d(LOG, "cleanup decode buffer");
 		cleanUpHuffmanDecodeBuffer(decode_buffer);
-		((F5Notification) a).onUpdate();
+		update();
 	}
 	
 	public void cleanUpPermutation() {
 		Log.d(LOG, "cleanup permutation buffer");
 		cleanUpPermutation(permutation);
+		update();
+	}
+	
+	public void update() {
 		((F5Notification) a).onUpdate();
 	}
 }

@@ -324,6 +324,7 @@ public class HuffmanDecode {
         int MCUCount = 0;
 
         // System.out.println("BlockCount="+getBlockCount());
+        
         final boolean bDoIt = true;
         while (bDoIt) {
             // Get component 1 of MCU
@@ -391,6 +392,7 @@ public class HuffmanDecode {
         return tmpBuff;
         */
         f5.setHuffmanDecodeBuffer(pos, 0);
+        f5.update();
         return pos;
     }
 
