@@ -1,5 +1,6 @@
 package info.guardianproject.f5android;
 
+import info.guardianproject.f5android.F5Buffers.F5Notification;
 import james.Jpeg;
 
 import java.io.ByteArrayOutputStream;
@@ -50,6 +51,8 @@ public class Extract {
 		} catch (IOException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
+			
+			((F5Notification) a).onFailure();
 		}
     	
     }
