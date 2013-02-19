@@ -25,7 +25,10 @@ public class Embed {
     // .tif, .gif, .jpg
     // If not, print the standard use info.
     boolean haveInputImage = false;
-    String comment = "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
+
+    //String comment = "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
+    String comment = "";
+    
     String inFileName = null;
     String outFileName = null;
     String secret_message = null;
