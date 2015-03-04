@@ -70,7 +70,6 @@ public class HuffTable {
     // Constructor Method
     public HuffTable(final DataInputStream d, final int l) {
         this.dis = d;
-        // System.out.println("L�nge="+l);
         // Get table data from input stream
         this.Ln = 19 + getTableData();
         // System.out.println(Ln);

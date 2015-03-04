@@ -10,13 +10,17 @@ public class F5Random {
 
     private byte[] b = null;
     
-	public F5Random() {
+    public F5Random() {
+    	this(new String("abcdefg123").getBytes());
+    }
+    
+	public F5Random(byte[] seed) {
 		for(Provider p : Security.getProviders()) {
             System.out.println("PROVIDER: " + p.getName());
         }
 		
         this.random = new SecureRandom();
-        this.random.engineSetSeed(new String("abcdefg123").getBytes());
+        this.random.engineSetSeed(seed);
         this.b = new byte[1];
     }
 
