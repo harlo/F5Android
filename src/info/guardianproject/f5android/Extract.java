@@ -36,18 +36,18 @@ public class Extract {
     	public void onExtractionResult(ByteArrayOutputStream baos);
     }
     
-    public Extract(Activity a, String f) {
-    	this(a, new File(f));
+    public Extract(Activity a, String f, byte[] random_seed) {
+    	this(a, new File(f), random_seed);
     }
     
-    public Extract(Activity a, File f) {
+    public Extract(Activity a, File f, byte[] random_seed) {
     	fos = new ByteArrayOutputStream();
     	this.f = f;
     	this.a = a;
     	
     	try {
     		final FileInputStream fis = new FileInputStream(this.f);
-			extract(fis, (int) f.length(), fos);
+			extract(fis, (int) f.length(), fos, random_seed);
 		} catch (IOException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
@@ -57,7 +57,7 @@ public class Extract {
     	
     }
 
-    public void extract(InputStream fis, int flength, ByteArrayOutputStream fos)
+    public void extract(InputStream fis, int flength, ByteArrayOutputStream fos, byte[] random_seed)
             throws IOException {
         carrier = new byte[flength];
         fis.read(carrier);
@@ -67,7 +67,7 @@ public class Extract {
         int coeff_length = hd.decode();
         
         Log.d(Jpeg.LOG, "Permutation starts");
-        final F5Random random = new F5Random();
+        final F5Random random = new F5Random(random_seed);
         final Permutation permutation = new Permutation(coeff_length, random, hd.f5);
         
         Log.d(Jpeg.LOG, coeff_length + " indices shuffled");

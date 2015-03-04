@@ -11,6 +11,7 @@ public class F5Random {
     private byte[] b = null;
     
     public F5Random() {
+    	// DEFAULT SEED USED.
     	this(new String("abcdefg123").getBytes());
     }
     
