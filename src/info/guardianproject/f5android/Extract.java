@@ -191,8 +191,8 @@ public class Extract {
         }
         
         if (nBytesExtracted < extractedFileLength) {
-        	Log.d(Jpeg.LOG, "Incomplete file: only " + nBytesExtracted + " of " + extractedFileLength
-                    + " bytes extracted");
+        	Log.d(Jpeg.LOG, "Incomplete file: only " + nBytesExtracted + " of " + extractedFileLength + " bytes extracted");
+        	((F5Notification) a).onFailure();
         } else {
         	((ExtractionListener) a).onExtractionResult(fos);
         }

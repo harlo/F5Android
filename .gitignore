@@ -1,4 +1,8 @@
 bin/*
 gen/*
+build.xml
+libs/
+local.properties
+obj/
 .DS_Store
 .settings/*
