@@ -190,6 +190,17 @@ public class F5Buffers {
 		return getPermutationValue(permutation, pos);
 	}
 	
+	public void abort() {
+		Log.d(LOG, "ABORTING F5 Process");
+		cleanUpImage();
+		cleanUpCoeffs();
+		cleanUpHuffmanBuffer();
+		cleanUpHuffmanDecodeBuffer();
+		cleanUpPermutation();
+		
+		((F5Notification) a).onFailure();
+	}
+	
 	public void cleanUpImage() {
 		Log.d(LOG, "cleanup image");
 		cleanUpImage(f5);
