@@ -32,26 +32,26 @@ public class Embed {
     String inFileName = null;
     String outFileName = null;
     String secret_message = null;
-    
+        
     public interface EmbedListener {
     	public void onEmbedded(File outFile);
     }
     
-    public Embed(Activity a, String inFileName, String secret_message) {
-    	this(a, "F5Android", inFileName, null, secret_message);
+    public Embed(Activity a, String inFileName, String secret_message, byte[] f5_seed) {
+    	this(a, "F5Android", inFileName, null, secret_message, f5_seed);
     }
     
-    public Embed(Activity a, String dump_dir, String inFileName, String secret_message) {
-    	this(a, dump_dir, inFileName, null, secret_message);
+    public Embed(Activity a, String dump_dir, String inFileName, String secret_message, byte[] f5_seed) {
+    	this(a, dump_dir, inFileName, null, secret_message, f5_seed);
     	
     	this.secret_message = secret_message;
     }
     
-    public Embed(Activity a, String dump_dir, String inFileName, String outFileName, String secret_message) {
+    public Embed(Activity a, String dump_dir, String inFileName, String outFileName, String secret_message, byte[] f5_seed) {
     	this.a = a;
     	this.inFileName = inFileName;
     	this.file = new File(this.inFileName);
-    	
+    	    	
     	root_dir = new File(Environment.getExternalStorageDirectory(), dump_dir);
     	if(!root_dir.exists())
     		root_dir.mkdir();
@@ -78,7 +78,7 @@ public class Embed {
     		} catch(final IOException e) {}
     		
     		image = BitmapFactory.decodeFile(this.inFileName);
-    		jpg = new JpegEncoder(a, image, Quality, dataOut, comment);
+    		jpg = new JpegEncoder(a, image, Quality, dataOut, comment, f5_seed);
     		
     		try {
     			if(jpg.Compress(new ByteArrayInputStream(secret_message.getBytes()))) {

@@ -31,19 +31,19 @@ public class Jpeg {
 	public static final int DEFAULT_QUALITY = 80;
 	public static final String LOG = "***************** JPEG-STEGO ******************";
 	
-	public Jpeg(Activity a, String in_file_name, String out_file_name) {
-		this(a, in_file_name, DEFAULT_QUALITY, null);
+	public Jpeg(Activity a, String in_file_name, String out_file_name, byte[] f5_seed) {
+		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed);
 	}
 	
-	public Jpeg(Activity a, String in_file_name) {
-		this(a, in_file_name, DEFAULT_QUALITY, null);
+	public Jpeg(Activity a, String in_file_name, byte[] f5_seed) {
+		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed);
 	}
 	
-	public Jpeg(Activity a, String in_file_name, int quality) {
-		this(a, in_file_name, quality, null);
+	public Jpeg(Activity a, String in_file_name, int quality, byte[] f5_seed) {
+		this(a, in_file_name, quality, null, f5_seed);
 	}
 	
-    public Jpeg(Activity a, String in_file_name, int quality, String out_file_name) {
+    public Jpeg(Activity a, String in_file_name, int quality, String out_file_name, byte[] f5_seed) {
     	if(!root_dir.exists())
     		root_dir.mkdir();
     	
@@ -88,7 +88,7 @@ public class Jpeg {
 			
 			//image = BitmapFactory.decodeFile(in_file_name, opts);
 			image = BitmapFactory.decodeFile(in_file_name);
-			jpg = new JpegEncoder(a, image, Quality, dataOut, "");
+			jpg = new JpegEncoder(a, image, Quality, dataOut, "", f5_seed);
 			
 		} else {
 			// TODO: could not find the in file-- throw error

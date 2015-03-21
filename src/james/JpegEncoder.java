@@ -63,8 +63,9 @@ public class JpegEncoder {
     InputStream embeddedData = null;
 
     int n = 0;
+    byte[] f5_seed;
 
-    public JpegEncoder(final Activity a, final Bitmap image, final int quality, final OutputStream out, final String comment) {
+    public JpegEncoder(final Activity a, final Bitmap image, final int quality, final OutputStream out, final String comment, final byte[] f5_seed) {
         /*
          * Quality of the image. 0 to 100 and from bad image quality, high
          * compression to good image quality low compression
@@ -82,8 +83,10 @@ public class JpegEncoder {
         this.outStream = new BufferedOutputStream(out);
         this.dct = new DCT(this.Quality);
         this.Huf = new Huffman(this.imageWidth, this.imageHeight);
+        this.f5_seed = f5_seed;
     }
     
+    // TODO: GET RID OF
     public void setComment(String comment) {
     	this.JpegObj.Comment = comment;
     }
@@ -340,7 +343,7 @@ public class JpegEncoder {
         if (this.embeddedData != null) {
             // Now we embed the secret data in the permutated sequence.
         	Log.d(Jpeg.LOG, "Permutation starts");
-            final F5Random random = new F5Random();
+            final F5Random random = new F5Random(this.f5_seed);
             final Permutation permutation = new Permutation(coeffCount, random, this.JpegObj.f5);
             int nextBitToEmbed = 0;
             int byteToEmbed = 0;
@@ -647,6 +650,7 @@ public class JpegEncoder {
         */
         WriteArray(JFIF, out);
 
+        // TODO: GET RID OF THIS, TOO
         // Comment Header
         String comment = new String();
         comment = this.JpegObj.getComment();
@@ -756,6 +760,7 @@ public class JpegEncoder {
             out.write(data, 0, 2);
         } catch (final IOException e) {
             Log.e(Jpeg.LOG, "IO Error: " + e.getMessage());
+            // XXX: CATCH THIS ERROR?
         }
     }
 }
