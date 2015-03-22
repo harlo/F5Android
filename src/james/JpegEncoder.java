@@ -87,9 +87,11 @@ public class JpegEncoder {
     }
     
     // TODO: GET RID OF
+    /*
     public void setComment(String comment) {
     	this.JpegObj.Comment = comment;
     }
+    */
 
     public boolean Compress() {
         WriteHeaders(this.outStream);
@@ -652,6 +654,8 @@ public class JpegEncoder {
 
         // TODO: GET RID OF THIS, TOO
         // Comment Header
+        
+        /*
         String comment = new String();
         comment = this.JpegObj.getComment();
         length = comment.length();
@@ -664,6 +668,7 @@ public class JpegEncoder {
             java.lang.System.arraycopy(this.JpegObj.Comment.getBytes(), 0, COM, 4, this.JpegObj.Comment.length());
             WriteArray(COM, out);
         }
+        */
 
         // The DQT header
         // 0 is the luminance index and 1 is the chrominance index

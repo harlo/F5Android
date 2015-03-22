@@ -105,9 +105,11 @@ public class Jpeg {
 		
     }
     
+    /*
     public void setComment(String comment) {
     	jpg.setComment(comment);
     }
+    */
     
     public static void StandardUsage() {
     	// throw helpful error here.

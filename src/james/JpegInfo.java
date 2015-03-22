@@ -15,7 +15,7 @@
 package james;
 
 import info.guardianproject.f5android.F5Buffers;
-import info.guardianproject.f5android.F5Buffers.F5Notification;
+import info.guardianproject.f5android.R;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -25,7 +25,7 @@ import android.util.Log;
  * into its constituant components, downsizing those that need to be.
  */
 class JpegInfo {
-    String Comment;
+    String notification_message;
 
     public Bitmap imageobj;
 
@@ -96,16 +96,17 @@ class JpegInfo {
         this.imageobj = image;
         this.imageWidth = image.getWidth();
         this.imageHeight = image.getHeight();
+        
         // Comment =
         // "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
-        this.Comment = comment;
+        this.notification_message = a.getString(R.string.downsampling_components);
         getYCCArray();
         
     }
     
     void downsampleCb1(int comp) {
     	Log.d(Jpeg.LOG, "downsampling cb1: ");
-    	f5.update();
+    	f5.update(notification_message);
     	
     	int inrow, incol;
         int outrow, outcol;
@@ -132,7 +133,7 @@ class JpegInfo {
     
     void downsampleCr1(int comp) {
     	Log.d(Jpeg.LOG, "downsampling cr1: ");
-    	f5.update();
+    	f5.update(notification_message);
     	
     	int inrow, incol;
         int outrow, outcol;
@@ -181,10 +182,6 @@ class JpegInfo {
             incol = 0;
         }
         return output;
-    }
-
-    public String getComment() {
-        return this.Comment;
     }
 
     /*
@@ -280,9 +277,5 @@ class JpegInfo {
 
         downsampleCb1(1);
         downsampleCr1(2);
-    }
-
-    public void setComment(final String comment) {
-        this.Comment.concat(comment);
     }
 }

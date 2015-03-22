@@ -19,7 +19,7 @@ public class Permutation {
         	this.f5.setPermutationValues(new int[] {i}, i);
         }
         
-        this.f5.update();
+        this.f5.update(null);
         
         int maxRandom = size; // set number of entries to shuffle
         for (i = 0; i < size; i++) { // shuffle entries
@@ -29,7 +29,7 @@ public class Permutation {
             this.f5.setPermutationValues(new int[] { tmp }, maxRandom);
         }
         
-        this.f5.update();
+        this.f5.update(null);
     }
 
     // get value #i from the shuffled sequence
