@@ -53,7 +53,7 @@ public class F5Buffers {
 	private native void cleanUpHuffmanBuffer(ByteBuffer hb_pointer);
 	private native void cleanUpHuffmanDecodeBuffer(ByteBuffer hdb_pointer);
 	private native void cleanUpPermutation(ByteBuffer p_pointer);
-	
+		
 	static {
 		System.loadLibrary("F5Buffers");
 	}
@@ -61,6 +61,7 @@ public class F5Buffers {
 	public interface F5Notification {
 		public void onUpdate(String message);
 		public void onFailure();
+		public void onThreadInterrupted();
 	}
 	
 	public F5Buffers(Activity a) {
@@ -188,17 +189,6 @@ public class F5Buffers {
 	
 	public int getPermutationValues(int pos) {
 		return getPermutationValue(permutation, pos);
-	}
-	
-	public void abort() {
-		Log.d(LOG, "ABORTING F5 Process");
-		cleanUpImage();
-		cleanUpCoeffs();
-		cleanUpHuffmanBuffer();
-		cleanUpHuffmanDecodeBuffer();
-		cleanUpPermutation();
-		
-		((F5Notification) a).onFailure();
 	}
 	
 	public void cleanUpImage() {

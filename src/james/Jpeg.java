@@ -7,6 +7,8 @@
 
 package james; // westfeld
 
+import info.guardianproject.f5android.F5Buffers.F5Notification;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +22,8 @@ import android.util.Log;
 
 public class Jpeg {
 	Activity a;
+	Thread thread_monitor;
+	
 	File root_dir = new File(Environment.getExternalStorageDirectory(), "F5Android");
 	File inFile, outFile;
 	FileOutputStream dataOut = null;
@@ -31,29 +35,28 @@ public class Jpeg {
 	public static final int DEFAULT_QUALITY = 80;
 	public static final String LOG = "***************** JPEG-STEGO ******************";
 	
-	public Jpeg(Activity a, String in_file_name, String out_file_name, byte[] f5_seed) {
-		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed);
+	public Jpeg(Activity a, String in_file_name, String out_file_name, byte[] f5_seed, Thread thread_monitor) {
+		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed, thread_monitor);
 	}
 	
-	public Jpeg(Activity a, String in_file_name, byte[] f5_seed) {
-		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed);
+	public Jpeg(Activity a, String in_file_name, byte[] f5_seed, Thread thread_monitor) {
+		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed, thread_monitor);
 	}
 	
-	public Jpeg(Activity a, String in_file_name, int quality, byte[] f5_seed) {
-		this(a, in_file_name, quality, null, f5_seed);
+	public Jpeg(Activity a, String in_file_name, int quality, byte[] f5_seed, Thread thread_monitor) {
+		this(a, in_file_name, quality, null, f5_seed, thread_monitor);
 	}
 	
-    public Jpeg(Activity a, String in_file_name, int quality, String out_file_name, byte[] f5_seed) {
+    public Jpeg(Activity a, String in_file_name, int quality, String out_file_name, byte[] f5_seed, Thread thread_monitor) {
+    	this.thread_monitor = thread_monitor;
+    	Log.d(LOG, "EMBED THREAD RUNNING: " + this.thread_monitor.getId());
+    	
     	if(!root_dir.exists())
     		root_dir.mkdir();
     	
     	this.a = a;
     	String string = new String();
-    	inFile = new File(in_file_name);
-    	
-    	if(in_file_name.endsWith(".jpg") && !in_file_name.endsWith(".tif") && !in_file_name.endsWith(".gif")) {
-    		StandardUsage();
-    	}
+    	inFile = new File(in_file_name);    	
     	
     	if(out_file_name == null) {
     		string = inFile.getName().substring(0, inFile.getName().lastIndexOf(".")) + ".jpg";
@@ -88,7 +91,7 @@ public class Jpeg {
 			
 			//image = BitmapFactory.decodeFile(in_file_name, opts);
 			image = BitmapFactory.decodeFile(in_file_name);
-			jpg = new JpegEncoder(a, image, Quality, dataOut, "", f5_seed);
+			jpg = new JpegEncoder(a, image, Quality, dataOut, "", f5_seed, thread_monitor);
 			
 		} else {
 			// TODO: could not find the in file-- throw error
@@ -98,20 +101,14 @@ public class Jpeg {
     }
     
     public void compress(InputStream embedFile) {
-    	jpg.Compress(embedFile);
+    	
 		try {
+			jpg.Compress(embedFile);
 			dataOut.close();
-		} catch(final IOException e) {}
+		} catch(IOException e) {}
+		catch(InterruptedException e) {
+			((F5Notification) a).onThreadInterrupted();
+		}
 		
-    }
-    
-    /*
-    public void setComment(String comment) {
-    	jpg.setComment(comment);
-    }
-    */
-    
-    public static void StandardUsage() {
-    	// throw helpful error here.
     }
 }

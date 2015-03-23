@@ -586,6 +586,7 @@ public class HuffmanDecode {
         } catch (final IOException e) {
             e.printStackTrace();
         }
+        
         return b;
     }
 

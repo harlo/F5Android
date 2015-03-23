@@ -101,7 +101,6 @@ class JpegInfo {
         // "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
         this.notification_message = a.getString(R.string.downsampling_components);
         getYCCArray();
-        
     }
     
     void downsampleCb1(int comp) {
