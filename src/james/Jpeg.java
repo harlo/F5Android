@@ -7,7 +7,7 @@
 
 package james; // westfeld
 
-import info.guardianproject.f5android.F5Buffers.F5Notification;
+import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
 
 import java.io.File;
 import java.io.FileOutputStream;

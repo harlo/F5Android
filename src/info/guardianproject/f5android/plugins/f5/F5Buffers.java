@@ -1,5 +1,6 @@
-package info.guardianproject.f5android;
+package info.guardianproject.f5android.plugins.f5;
 
+import info.guardianproject.f5android.R;
 import java.nio.ByteBuffer;
 
 import android.app.Activity;

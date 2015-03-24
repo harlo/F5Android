@@ -1,6 +1,6 @@
 package net.f5.crypt;
 
-import info.guardianproject.f5android.F5Buffers;
+import info.guardianproject.f5android.plugins.f5.F5Buffers;
 
 public class Permutation {
     // The constructor of class Permutation creates a shuffled

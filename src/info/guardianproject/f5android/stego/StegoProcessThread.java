@@ -1,12 +1,13 @@
-package info.guardianproject.stego;
+package info.guardianproject.f5android.stego;
 
+import info.guardianproject.f5android.Constants.Logger;
 import android.util.Log;
 
 public class StegoProcessThread extends Thread implements ThreadMonitorListener {
 	private Thread thread_monitor;
 	private static String LOG;
 	
-	private static final String default_log_name = "***************** info.guardianproject.stego (Process Thread) **************";
+	private static final String default_log_name = Logger.THREAD;
 	
 	public StegoProcessThread() {
 		this(default_log_name);

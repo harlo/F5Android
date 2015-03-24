@@ -14,8 +14,8 @@
 
 package james;
 
-import info.guardianproject.f5android.F5Buffers;
 import info.guardianproject.f5android.R;
+import info.guardianproject.f5android.plugins.f5.F5Buffers;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;

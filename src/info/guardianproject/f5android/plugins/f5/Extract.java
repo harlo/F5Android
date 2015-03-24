@@ -1,7 +1,7 @@
-package info.guardianproject.f5android;
+package info.guardianproject.f5android.plugins.f5;
 
-import info.guardianproject.f5android.F5Buffers.F5Notification;
-import info.guardianproject.stego.StegoProcessThread;
+import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
+import info.guardianproject.f5android.stego.StegoProcessThread;
 import james.Jpeg;
 
 import java.io.ByteArrayOutputStream;

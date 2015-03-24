@@ -33,7 +33,7 @@ package net.f5.ortega;
 // constructor changed to byte array parameter
 // added method rawDecode
 //
-import info.guardianproject.f5android.F5Buffers;
+import info.guardianproject.f5android.plugins.f5.F5Buffers;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
