@@ -1,4 +1,4 @@
-#include "info_guardianproject_f5android_F5Buffers.h"
+#include "info_guardianproject_f5android_plugins_f5_F5Buffers.h"
 #include <jni.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -99,7 +99,7 @@ public:
 
 };
 
-JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initImage
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_initImage
 (JNIEnv *env, jobject obj, jintArray dimensions, jintArray comp_width, jintArray comp_height)
 {
 	int* dimensions_ = env->GetIntArrayElements(dimensions, NULL);
@@ -115,35 +115,35 @@ JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initImag
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5Image));
 }
 
-JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initCoeffs
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_initCoeffs
 (JNIEnv *env, jobject obj, int coeffs_size)
 {
 	F5Coeffs* f5 = new F5Coeffs(coeffs_size);
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5Coeffs));
 }
 
-JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuffmanBuffer
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_initHuffmanBuffer
 (JNIEnv *env, jobject obj, int hb_size)
 {
 	F5HuffmanBuffer* f5 = new F5HuffmanBuffer(hb_size);
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5HuffmanBuffer));
 }
 
-JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initHuffmanDecodeBuffer
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_initHuffmanDecodeBuffer
   (JNIEnv *env, jobject obj, int hdb_size)
 {
 	F5HuffmanDecodeBuffer* f5 = new F5HuffmanDecodeBuffer(hdb_size);
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5HuffmanDecodeBuffer));
 }
 
-JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_F5Buffers_initPermutation
+JNIEXPORT jobject JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_initPermutation
   (JNIEnv *env, jobject obj, int p_size)
 {
 	F5Permutation* f5 = new F5Permutation(p_size);
 	return env->NewDirectByteBuffer((void*) f5, sizeof(F5Permutation));
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPixelValues
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setPixelValues
 (JNIEnv *env, jobject obj, jobject pntr, jintArray values, int v_len, int start)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
@@ -158,84 +158,84 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPixelVal
 	env->ReleaseIntArrayElements(values, values_, 0);
 }
 
-JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getPixelValue
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getPixelValue
 (JNIEnv *env, jobject obj, jobject pntr, int pos)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	return f5->pixel_array[pos];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setYValues
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setYValues
 (JNIEnv *env, jobject obj, jobject pntr, float value, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	f5->y_array[x][y] = value;
 }
 
-JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_F5Buffers_getYValue
+JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getYValue
 (JNIEnv *env, jobject obj, jobject pntr, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	return f5->y_array[x][y];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setCr1Values
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setCr1Values
 (JNIEnv *env, jobject obj, jobject pntr, float value, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	f5->cr1_array[x][y] = value;
 }
 
-JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_F5Buffers_getCr1Value
+JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getCr1Value
 (JNIEnv *env, jobject obj, jobject pntr, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	return f5->cr1_array[x][y];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setCb1Values
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setCb1Values
 (JNIEnv *env, jobject obj, jobject pntr, float value, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	f5->cb1_array[x][y] = value;
 }
 
-JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_F5Buffers_getCb1Value
+JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getCb1Value
 (JNIEnv *env, jobject obj, jobject pntr, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	return f5->cb1_array[x][y];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setCr2Values
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setCr2Values
 (JNIEnv *env, jobject obj, jobject pntr, float value, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	f5->cr2_array[x][y] = value;
 }
 
-JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_F5Buffers_getCr2Value
+JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getCr2Value
 (JNIEnv *env, jobject obj, jobject pntr, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	return f5->cr2_array[x][y];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setCb2Values
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setCb2Values
 (JNIEnv *env, jobject obj, jobject pntr, float value, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	f5->cb2_array[x][y] = value;
 }
 
-JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_F5Buffers_getCb2Value
+JNIEXPORT jfloat JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getCb2Value
 (JNIEnv *env, jobject obj, jobject pntr, int x, int y)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	return f5->cb2_array[x][y];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setCoeffValues
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setCoeffValues
 (JNIEnv *env, jobject obj, jobject pntr, jintArray values, int v_len, int start)
 {
 	F5Coeffs* f5 = (F5Coeffs*) env->GetDirectBufferAddress(pntr);
@@ -250,14 +250,14 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setCoeffVal
 	env->ReleaseIntArrayElements(values, values_, 0);
 }
 
-JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getCoeffValue
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getCoeffValue
 (JNIEnv *env, jobject obj, jobject pntr, int pos)
 {
 	F5Coeffs* f5 = (F5Coeffs*) env->GetDirectBufferAddress(pntr);
 	return f5->coeffs[pos];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setHuffmanBufferValues
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setHuffmanBufferValues
 (JNIEnv *env, jobject obj, jobject pntr, jintArray values, int v_len, int start)
 {
 	F5HuffmanBuffer* f5 = (F5HuffmanBuffer*) env->GetDirectBufferAddress(pntr);
@@ -271,14 +271,14 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setHuffmanB
 	env->ReleaseIntArrayElements(values, values_, 0);
 }
 
-JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanBufferValue
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getHuffmanBufferValue
 (JNIEnv *env, jobject obj, jobject pntr, int pos)
 {
 	F5HuffmanBuffer* f5 = (F5HuffmanBuffer*) env->GetDirectBufferAddress(pntr);
 	return f5->buffer[pos];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setHuffmanDecodeBufferValues
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setHuffmanDecodeBufferValues
   (JNIEnv *env, jobject obj, jobject hdb_pntr, jobject hb_pntr, int v_len, int start)
 {
 	F5HuffmanBuffer* f5 = (F5HuffmanBuffer*) env->GetDirectBufferAddress(hb_pntr);
@@ -290,14 +290,14 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setHuffmanD
 	}
 }
 
-JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getHuffmanDecodeBufferValue
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getHuffmanDecodeBufferValue
   (JNIEnv *env, jobject obj, jobject pntr, int pos)
 {
 	F5HuffmanDecodeBuffer* f5 = (F5HuffmanDecodeBuffer*) env->GetDirectBufferAddress(pntr);
 	return f5->buffer[pos];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPermutationValues
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_setPermutationValues
   (JNIEnv *env, jobject obj, jobject pntr, jintArray values, int v_len, int start)
 {
 	F5Permutation* f5 = (F5Permutation*) env->GetDirectBufferAddress(pntr);
@@ -311,42 +311,42 @@ JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_setPermutat
 	env->ReleaseIntArrayElements(values, values_, 0);
 }
 
-JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_F5Buffers_getPermutationValue
+JNIEXPORT jint JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_getPermutationValue
   (JNIEnv *env, jobject obj, jobject pntr, int pos)
 {
 	F5Permutation* f5 = (F5Permutation*) env->GetDirectBufferAddress(pntr);
 	return f5->buffer[pos];
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpImage
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_cleanUpImage
 (JNIEnv *env, jobject obj, jobject pntr)
 {
 	F5Image* f5 = (F5Image*) env->GetDirectBufferAddress(pntr);
 	delete(f5);
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpCoeffs
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_cleanUpCoeffs
 (JNIEnv *env, jobject obj, jobject pntr)
 {
 	F5Coeffs* f5 = (F5Coeffs*) env->GetDirectBufferAddress(pntr);
 	delete(f5);
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuffmanBuffer
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_cleanUpHuffmanBuffer
 (JNIEnv *env, jobject obj, jobject pntr)
 {
 	F5HuffmanBuffer* f5 = (F5HuffmanBuffer*) env->GetDirectBufferAddress(pntr);
 	delete(f5);
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpHuffmanDecodeBuffer
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_cleanUpHuffmanDecodeBuffer
 (JNIEnv *env, jobject obj, jobject pntr)
 {
 	F5HuffmanDecodeBuffer* f5 = (F5HuffmanDecodeBuffer*) env->GetDirectBufferAddress(pntr);
 	delete(f5);
 }
 
-JNIEXPORT void JNICALL Java_info_guardianproject_f5android_F5Buffers_cleanUpPermutation
+JNIEXPORT void JNICALL Java_info_guardianproject_f5android_plugins_f5_F5Buffers_cleanUpPermutation
 (JNIEnv *env, jobject obj, jobject pntr)
 {
 	F5Permutation* f5 = (F5Permutation*) env->GetDirectBufferAddress(pntr);
