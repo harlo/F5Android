@@ -12,7 +12,7 @@
 // Jpeg Group's Jpeg 6a library, Copyright Thomas G. Lane.
 // See license.txt for details.
 
-package james;
+package info.guardianproject.f5android.plugins.f5.james;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;

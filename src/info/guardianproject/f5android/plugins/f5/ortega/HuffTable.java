@@ -34,7 +34,7 @@
  */
 
 // westfeld
-package net.f5.ortega;
+package info.guardianproject.f5android.plugins.f5.ortega;
 
 import java.io.DataInputStream;
 import java.io.IOException;

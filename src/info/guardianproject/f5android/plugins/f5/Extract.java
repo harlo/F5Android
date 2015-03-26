@@ -1,8 +1,11 @@
 package info.guardianproject.f5android.plugins.f5;
 
 import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
+import info.guardianproject.f5android.plugins.f5.crypt.F5Random;
+import info.guardianproject.f5android.plugins.f5.crypt.Permutation;
+import info.guardianproject.f5android.plugins.f5.james.Jpeg;
+import info.guardianproject.f5android.plugins.f5.ortega.HuffmanDecode;
 import info.guardianproject.f5android.stego.StegoProcessThread;
-import james.Jpeg;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,9 +15,6 @@ import java.io.InputStream;
 
 import android.app.Activity;
 import android.util.Log;
-import net.f5.crypt.F5Random;
-import net.f5.crypt.Permutation;
-import net.f5.ortega.HuffmanDecode;
 
 public class Extract extends StegoProcessThread {
 	private File f; // carrier file
@@ -63,8 +63,8 @@ public class Extract extends StegoProcessThread {
 		} catch (InterruptedException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
-
-			((F5Notification) a).onThreadInterrupted();
+			
+			((F5Notification) a).onFailure();
 		} catch(NullPointerException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
@@ -78,14 +78,14 @@ public class Extract extends StegoProcessThread {
 		carrier = new byte[flength];
 		fis.read(carrier);
 
-		final HuffmanDecode hd = new HuffmanDecode(a, carrier);
+		final HuffmanDecode hd = new HuffmanDecode(a, carrier, this);
 		Log.d(Jpeg.LOG, "Huffman decoding starts");
 		//coeff = hd.decode();
 		int coeff_length = hd.decode();
 
 		Log.d(Jpeg.LOG, "Permutation starts");
 		final F5Random random = new F5Random(f5_seed);
-		final Permutation permutation = new Permutation(coeff_length, random, hd.f5);
+		final Permutation permutation = new Permutation(coeff_length, random, hd.f5, this);
 
 		Log.d(Jpeg.LOG, coeff_length + " indices shuffled");
 		int extractedByte = 0;
@@ -97,6 +97,7 @@ public class Extract extends StegoProcessThread {
 		int i;
 
 		Log.d(Jpeg.LOG, "Extraction starts");
+		if(isInterrupted()) { return; }
 		// extract length information
 		for (i = 0; availableExtractedBits < 32; i++) {
 			shuffledIndex = permutation.getShuffled(i);
@@ -125,6 +126,7 @@ public class Extract extends StegoProcessThread {
 		extractedFileLength &= 0x007fffff;
 
 		Log.d(Jpeg.LOG, "Length of embedded file: " + extractedFileLength + " bytes");
+		if(isInterrupted()) { return; }
 		availableExtractedBits = 0;
 		if (n > 0) {
 			int startOfN = i;

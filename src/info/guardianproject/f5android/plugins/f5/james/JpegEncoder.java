@@ -17,8 +17,12 @@
 // switch for multi-volume embedding
 // indeterministic embedding
 // password switch
-package james;
+package info.guardianproject.f5android.plugins.f5.james;
 
+
+import info.guardianproject.f5android.plugins.f5.crypt.F5Random;
+import info.guardianproject.f5android.plugins.f5.crypt.Permutation;
+import info.guardianproject.f5android.stego.StegoProcessThread;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -28,9 +32,6 @@ import java.io.OutputStream;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
-
-import net.f5.crypt.F5Random;
-import net.f5.crypt.Permutation;
 
 /**
  * JpegEncoder - The JPEG main program which performs a jpeg compression of an
@@ -64,9 +65,9 @@ public class JpegEncoder {
 
 	int n = 0;
 	byte[] f5_seed;
-	Thread thread_monitor;
+	StegoProcessThread thread_monitor;
 
-	public JpegEncoder(Activity a, Bitmap image, int quality, OutputStream out, String comment, byte[] f5_seed, Thread thread_monitor) {
+	public JpegEncoder(Activity a, Bitmap image, int quality, OutputStream out, byte[] f5_seed, StegoProcessThread thread_monitor) {
 		/*
 		 * Quality of the image. 0 to 100 and from bad image quality, high
 		 * compression to good image quality low compression
@@ -77,7 +78,8 @@ public class JpegEncoder {
 		 * Getting picture information It takes the Width, Height and RGB scans
 		 * of the image.
 		 */
-		this.JpegObj = new JpegInfo(a, image, comment);
+		this.thread_monitor = thread_monitor;
+		this.JpegObj = new JpegInfo(a, image, this.thread_monitor);
 
 		this.imageHeight = this.JpegObj.imageHeight;
 		this.imageWidth = this.JpegObj.imageWidth;
@@ -85,13 +87,23 @@ public class JpegEncoder {
 		this.dct = new DCT(this.Quality);
 		this.Huf = new Huffman(this.imageWidth, this.imageHeight);
 		this.f5_seed = f5_seed;
-		this.thread_monitor = thread_monitor;
+		
 	}
 
-	public boolean Compress() throws InterruptedException {
+	@SuppressWarnings("static-access")
+	public boolean Compress() {
+		Log.d(thread_monitor.LOG, "NOW COMPRESSING...");
+		
+		if(this.thread_monitor.isInterrupted()) { return false; }
 		WriteHeaders(this.outStream);
+		
+		if(this.thread_monitor.isInterrupted()) { return false; }
 		WriteCompressedData(this.outStream);
+		
+		if(this.thread_monitor.isInterrupted()) { return false; }
 		WriteEOI(this.outStream);
+		
+		if(this.thread_monitor.isInterrupted()) { return false; }
 		try {
 			this.outStream.flush();
 			this.JpegObj.f5.cleanUpCoeffs();
@@ -109,7 +121,7 @@ public class JpegEncoder {
 		return false;
 	}
 
-	public boolean Compress(final InputStream embeddedData) throws InterruptedException {
+	public boolean Compress(final InputStream embeddedData) {
 		this.embeddedData = embeddedData;
 		return Compress();
 	}
@@ -179,6 +191,8 @@ public class JpegEncoder {
 				}
 			}
 		}
+		
+		if(this.thread_monitor.isInterrupted()) { return; }
 		this.JpegObj.f5.initF5Coeffs(coeffCount);
 
 		Log.d(Jpeg.LOG, "DCT/quantisation starts");
@@ -342,7 +356,7 @@ public class JpegEncoder {
 			// Now we embed the secret data in the permutated sequence.
 			Log.d(Jpeg.LOG, "Permutation starts");
 			final F5Random random = new F5Random(this.f5_seed);
-			final Permutation permutation = new Permutation(coeffCount, random, this.JpegObj.f5);
+			final Permutation permutation = new Permutation(coeffCount, random, this.JpegObj.f5, this.thread_monitor);
 			int nextBitToEmbed = 0;
 			int byteToEmbed = 0;
 			int availableBitsToEmbed = 0;

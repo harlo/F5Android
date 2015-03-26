@@ -1,4 +1,4 @@
-package net.f5.crypt;
+package info.guardianproject.f5android.plugins.f5.crypt;
 
 import sun.security.provider.SecureRandom;
 

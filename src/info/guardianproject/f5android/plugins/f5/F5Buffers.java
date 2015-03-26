@@ -62,7 +62,6 @@ public class F5Buffers {
 	public interface F5Notification {
 		public void onUpdate(String message);
 		public void onFailure();
-		public void onThreadInterrupted();
 	}
 	
 	public F5Buffers(Activity a) {

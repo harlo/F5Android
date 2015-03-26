@@ -1,4 +1,4 @@
-package net.f5.image;
+package info.guardianproject.f5android.plugins.f5.image;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

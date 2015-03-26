@@ -12,10 +12,11 @@
 // Jpeg Group's Jpeg 6a library, Copyright Thomas G. Lane.
 // See license.txt for details.
 
-package james;
+package info.guardianproject.f5android.plugins.f5.james;
 
 import info.guardianproject.f5android.R;
 import info.guardianproject.f5android.plugins.f5.F5Buffers;
+import info.guardianproject.f5android.stego.StegoProcessThread;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -85,9 +86,11 @@ class JpegInfo {
     public int MaxVsampFactor;
     
     public F5Buffers f5;
+    private StegoProcessThread thread_monitor;
 
-    public JpegInfo(Activity a, final Bitmap image, final String comment) {
+    public JpegInfo(Activity a, final Bitmap image, StegoProcessThread thread_monitor) {
     	f5 = new F5Buffers(a);
+    	
         this.Components = new Object[this.NumberOfComponents];
         this.compWidth = new int[this.NumberOfComponents];
         this.compHeight = new int[this.NumberOfComponents];
@@ -96,6 +99,7 @@ class JpegInfo {
         this.imageobj = image;
         this.imageWidth = image.getWidth();
         this.imageHeight = image.getHeight();
+        this.thread_monitor = thread_monitor;
         
         // Comment =
         // "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
@@ -105,6 +109,7 @@ class JpegInfo {
     
     void downsampleCb1(int comp) {
     	Log.d(Jpeg.LOG, "downsampling cb1: ");
+    	if(this.thread_monitor.isInterrupted()) { return; }
     	f5.update(notification_message);
     	
     	int inrow, incol;
@@ -131,6 +136,8 @@ class JpegInfo {
     }
     
     void downsampleCr1(int comp) {
+    	if(thread_monitor.isInterrupted()) { return; }
+    	
     	Log.d(Jpeg.LOG, "downsampling cr1: ");
     	f5.update(notification_message);
     	
@@ -217,6 +224,7 @@ class JpegInfo {
         }
         
         // XXX: throws outofmemory errors! move to JNI?
+        if(this.thread_monitor.isInterrupted()) { return; }
         this.f5.initF5Image(new int[] {this.imageWidth, this.imageHeight}, this.compWidth, this.compHeight);
         //final int values[] = new int[this.imageWidth * this.imageHeight];
         

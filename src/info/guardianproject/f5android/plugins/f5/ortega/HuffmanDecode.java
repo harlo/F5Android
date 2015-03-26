@@ -26,7 +26,7 @@
 //
 // changes by Andreas Westfeld
 // <mailto:westfeld@inf.tu-dresden.de>
-package net.f5.ortega;
+package info.guardianproject.f5android.plugins.f5.ortega;
 
 //
 // Mar 15 1999
@@ -34,6 +34,7 @@ package net.f5.ortega;
 // added method rawDecode
 //
 import info.guardianproject.f5android.plugins.f5.F5Buffers;
+import info.guardianproject.f5android.stego.StegoProcessThread;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -208,12 +209,14 @@ public class HuffmanDecode {
     Date dt;
     
     public F5Buffers f5;
+    private StegoProcessThread thread_monitor;
 
     // }}
 
     // Constructor Method
-    public HuffmanDecode(Activity a, final byte[] data) {
+    public HuffmanDecode(Activity a, final byte[] data, StegoProcessThread thread_monitor) {
     	f5 = new F5Buffers(a);
+    	this.thread_monitor = thread_monitor;
     	
         this.size = (short) data.length;
         this.dis = new DataInputStream(new ByteArrayInputStream(data));
@@ -319,6 +322,7 @@ public class HuffmanDecode {
         // Calculate the Number of blocks encoded
         // warum doppelt so viel?
         //final int buff[] = new int[2 * 8 * 8 * getBlockCount()];
+        if(this.thread_monitor.isInterrupted()) { return -1; }
         this.f5.initF5HuffmanBuffer(2 * 8 * 8 * getBlockCount());
         int pos = 0;
         int MCUCount = 0;

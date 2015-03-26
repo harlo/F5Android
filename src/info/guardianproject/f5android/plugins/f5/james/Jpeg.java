@@ -5,9 +5,9 @@
 // See license.txt for details about the allowed used of this software.
 // See IJGreadme.txt for details about the Independent JPEG Group's license.
 
-package james; // westfeld
+package info.guardianproject.f5android.plugins.f5.james; // westfeld
 
-import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
+import info.guardianproject.f5android.stego.StegoProcessThread;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,19 +35,19 @@ public class Jpeg {
 	public static final int DEFAULT_QUALITY = 80;
 	public static final String LOG = "***************** JPEG-STEGO ******************";
 	
-	public Jpeg(Activity a, String in_file_name, String out_file_name, byte[] f5_seed, Thread thread_monitor) {
+	public Jpeg(Activity a, String in_file_name, String out_file_name, byte[] f5_seed, StegoProcessThread thread_monitor) {
 		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed, thread_monitor);
 	}
 	
-	public Jpeg(Activity a, String in_file_name, byte[] f5_seed, Thread thread_monitor) {
+	public Jpeg(Activity a, String in_file_name, byte[] f5_seed, StegoProcessThread thread_monitor) {
 		this(a, in_file_name, DEFAULT_QUALITY, null, f5_seed, thread_monitor);
 	}
 	
-	public Jpeg(Activity a, String in_file_name, int quality, byte[] f5_seed, Thread thread_monitor) {
+	public Jpeg(Activity a, String in_file_name, int quality, byte[] f5_seed, StegoProcessThread thread_monitor) {
 		this(a, in_file_name, quality, null, f5_seed, thread_monitor);
 	}
 	
-    public Jpeg(Activity a, String in_file_name, int quality, String out_file_name, byte[] f5_seed, Thread thread_monitor) {
+    public Jpeg(Activity a, String in_file_name, int quality, String out_file_name, byte[] f5_seed, StegoProcessThread thread_monitor) {
     	this.thread_monitor = thread_monitor;
     	Log.d(LOG, "EMBED THREAD RUNNING: " + this.thread_monitor.getId());
     	
@@ -73,6 +73,7 @@ public class Jpeg {
     	
     	outFile = new File(root_dir, string);
     	
+    	if(thread_monitor.isInterrupted()) { return; }
     	
 		if(inFile.exists()) {
 			try {
@@ -91,7 +92,7 @@ public class Jpeg {
 			
 			//image = BitmapFactory.decodeFile(in_file_name, opts);
 			image = BitmapFactory.decodeFile(in_file_name);
-			jpg = new JpegEncoder(a, image, Quality, dataOut, "", f5_seed, thread_monitor);
+			jpg = new JpegEncoder(a, image, Quality, dataOut, f5_seed, thread_monitor);
 			
 		} else {
 			// TODO: could not find the in file-- throw error
@@ -101,14 +102,12 @@ public class Jpeg {
     }
     
     public void compress(InputStream embedFile) {
+    	if(thread_monitor.isInterrupted()) { return; }
     	
 		try {
 			jpg.Compress(embedFile);
 			dataOut.close();
 		} catch(IOException e) {}
-		catch(InterruptedException e) {
-			((F5Notification) a).onThreadInterrupted();
-		}
 		
     }
 }

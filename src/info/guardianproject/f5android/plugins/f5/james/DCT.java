@@ -12,7 +12,7 @@
 // Jpeg Group's Jpeg 6a library, Copyright Thomas G. Lane.
 // See license.txt for details.
 
-package james;
+package info.guardianproject.f5android.plugins.f5.james;
 
 /**
  * DCT - A Java implementation of the Discreet Cosine Transform

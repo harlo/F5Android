@@ -1,9 +1,9 @@
 package info.guardianproject.f5android.plugins.f5;
 
 import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
+import info.guardianproject.f5android.plugins.f5.james.Jpeg;
+import info.guardianproject.f5android.plugins.f5.james.JpegEncoder;
 import info.guardianproject.f5android.stego.StegoProcessThread;
-import james.Jpeg;
-import james.JpegEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,8 +17,6 @@ import android.os.Environment;
 import android.util.Log;
 
 public class Embed extends StegoProcessThread {
-	private Thread thread_monitor;
-
 	Activity a;
 	Bitmap image = null;
 	FileOutputStream dataOut = null;
@@ -30,12 +28,9 @@ public class Embed extends StegoProcessThread {
 	// If not, print the standard use info.
 	boolean haveInputImage = false;
 
-	//String comment = "JPEG Encoder Copyright 1998, James R. Weeks and BioElectroMech.  ";
-	String comment = "";
-
 	String inFileName = null;
 	String outFileName = null;
-	String secret_message = null;
+	public String secret_message = null;
 	String dump_dir = null;
 
 	private byte[] f5_seed;
@@ -65,7 +60,9 @@ public class Embed extends StegoProcessThread {
 
 	public void run(){
 		super.run();
-
+		
+		if(isInterrupted()) { return; }
+		
 		root_dir = new File(Environment.getExternalStorageDirectory(), dump_dir);
 		if(!root_dir.exists())
 			root_dir.mkdir();
@@ -84,26 +81,28 @@ public class Embed extends StegoProcessThread {
 			if(i > 100)
 				return;
 		}
-
+		
+		if(isInterrupted()) { return; }
 		try {
 			embed();
-		} catch(InterruptedException e) {
+		} catch(Exception e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
 
-			((F5Notification) a).onThreadInterrupted();
+			((F5Notification) a).onFailure();
 		}
 	}
 
-	private void embed() throws InterruptedException {
+	private void embed() {
 		if(this.file.exists()) {
 			try {
 				dataOut = new FileOutputStream(outFile);
 			} catch(final IOException e) {}
-
+			
 			image = BitmapFactory.decodeFile(this.inFileName);
-			jpg = new JpegEncoder(a, image, Quality, dataOut, comment, f5_seed, thread_monitor);
-
+			jpg = new JpegEncoder(a, image, Quality, dataOut, f5_seed, this);
+			
+			if(isInterrupted()) { return; }
 			try {
 				if(jpg.Compress(new ByteArrayInputStream(secret_message.getBytes()))) {
 					((EmbedListener) a).onEmbedded(outFile);
