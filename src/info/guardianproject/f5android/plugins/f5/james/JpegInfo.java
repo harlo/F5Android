@@ -110,7 +110,7 @@ class JpegInfo {
     void downsampleCb1(int comp) {
     	Log.d(Jpeg.LOG, "downsampling cb1: ");
     	if(this.thread_monitor.isInterrupted()) { return; }
-    	f5.update(notification_message);
+    	f5.onUpdate(notification_message);
     	
     	int inrow, incol;
         int outrow, outcol;
@@ -139,7 +139,7 @@ class JpegInfo {
     	if(thread_monitor.isInterrupted()) { return; }
     	
     	Log.d(Jpeg.LOG, "downsampling cr1: ");
-    	f5.update(notification_message);
+    	f5.onUpdate(notification_message);
     	
     	int inrow, incol;
         int outrow, outcol;

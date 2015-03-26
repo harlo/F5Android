@@ -22,7 +22,7 @@ public class Permutation {
         	this.f5.setPermutationValues(new int[] {i}, i);
         }
         
-        this.f5.update(null);
+        this.f5.onUpdate(null);
         
         if(thread_monitor.isInterrupted()) { return; }
         int maxRandom = size; // set number of entries to shuffle
@@ -33,7 +33,7 @@ public class Permutation {
             this.f5.setPermutationValues(new int[] { tmp }, maxRandom);
         }
         
-        this.f5.update(null);
+        this.f5.onUpdate(null);
     }
 
     // get value #i from the shuffled sequence

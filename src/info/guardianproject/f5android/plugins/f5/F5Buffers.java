@@ -1,12 +1,14 @@
 package info.guardianproject.f5android.plugins.f5;
 
 import info.guardianproject.f5android.R;
+import info.guardianproject.f5android.plugins.PluginNotificationListener;
+
 import java.nio.ByteBuffer;
 
 import android.app.Activity;
 import android.util.Log;
 
-public class F5Buffers {
+public class F5Buffers implements PluginNotificationListener {
 	public final static String LOG = "************** PK JNI WRAPPER **************";
 	private Activity a;
 	private ByteBuffer f5, coeffs, buffer, decode_buffer, permutation;
@@ -59,11 +61,6 @@ public class F5Buffers {
 		System.loadLibrary("F5Buffers");
 	}
 	
-	public interface F5Notification {
-		public void onUpdate(String message);
-		public void onFailure();
-	}
-	
 	public F5Buffers(Activity a) {
 		this.a = a;
 		cleanup_string = a.getString(R.string.cleaning_up);
@@ -72,25 +69,25 @@ public class F5Buffers {
 	public void initF5Image(int[] dimensions, int[] compWidth, int[] compHeight) {
 		Log.d(LOG, "initImage");
 		f5 = initImage(dimensions, compWidth, compHeight);
-		update(a.getString(R.string.querying_image));
+		onUpdate(a.getString(R.string.querying_image));
 	}
 	
 	public void initF5Coeffs(int size) {
 		Log.d(LOG, "initCoeffs");
 		coeffs = initCoeffs(size);
-		update(a.getString(R.string.init_coeffs));
+		onUpdate(a.getString(R.string.init_coeffs));
 	}
 	
 	public void initF5HuffmanBuffer(int size) {
 		Log.d(LOG, "initHuffmanBuffer");
 		buffer = initHuffmanBuffer(size);
-		update(a.getString(R.string.init_huffman_buffer));
+		onUpdate(a.getString(R.string.init_huffman_buffer));
 	}
 	
 	public void initF5Permutation(int size) {
 		Log.d(LOG, "initPermutation");
 		permutation = initPermutation(size);
-		update(a.getString(R.string.init_permutation));
+		onUpdate(a.getString(R.string.init_permutation));
 	}
 	
 	public void setPixelValues(int[] values, int start) {
@@ -169,14 +166,14 @@ public class F5Buffers {
 	}
 	
 	public int getHuffmanBufferValue(int pos) {
-		update(a.getString(R.string.reading_huffman_buffer));
+		onUpdate(a.getString(R.string.reading_huffman_buffer));
 		return getHuffmanBufferValue(buffer, pos);
 	}
 	
 	public void setHuffmanDecodeBuffer(int v_len, int start) {
 		decode_buffer = this.initHuffmanDecodeBuffer(v_len);
 		this.setHuffmanDecodeBufferValues(decode_buffer, buffer, v_len, start);
-		update(a.getString(R.string.setting_huffman_buffer));
+		onUpdate(a.getString(R.string.setting_huffman_buffer));
 	}
 	
 	public int getHuffmanDecodeBufferValue(int pos) {
@@ -194,34 +191,37 @@ public class F5Buffers {
 	public void cleanUpImage() {
 		Log.d(LOG, "cleanup image");
 		cleanUpImage(f5);
-		update(cleanup_string);
+		onUpdate(cleanup_string);
 	}
 	
 	public void cleanUpCoeffs() {
 		Log.d(LOG, "cleanup coeffs");
 		cleanUpCoeffs(coeffs);
-		update(cleanup_string);
+		onUpdate(cleanup_string);
 	}
 	
 	public void cleanUpHuffmanBuffer() {
 		Log.d(LOG, "cleanup huffman buffer");
 		cleanUpHuffmanBuffer(buffer);
-		update(cleanup_string);
+		onUpdate(cleanup_string);
 	}
 	
 	public void cleanUpHuffmanDecodeBuffer() {
 		Log.d(LOG, "cleanup decode buffer");
 		cleanUpHuffmanDecodeBuffer(decode_buffer);
-		update(cleanup_string);
+		onUpdate(cleanup_string);
 	}
 	
 	public void cleanUpPermutation() {
 		Log.d(LOG, "cleanup permutation buffer");
 		cleanUpPermutation(permutation);
-		update(cleanup_string);
+		onUpdate(cleanup_string);
 	}
 	
-	public void update(String with_message) {
-		((F5Notification) a).onUpdate(with_message);
+	@Override
+	public void onUpdate(String with_message) {
+		((PluginNotificationListener) a).onUpdate(with_message);
 	}
+	@Override
+	public void onFailure() {}
 }

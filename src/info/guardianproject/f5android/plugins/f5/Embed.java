@@ -1,6 +1,6 @@
 package info.guardianproject.f5android.plugins.f5;
 
-import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
+import info.guardianproject.f5android.plugins.PluginNotificationListener;
 import info.guardianproject.f5android.plugins.f5.james.Jpeg;
 import info.guardianproject.f5android.plugins.f5.james.JpegEncoder;
 import info.guardianproject.f5android.stego.StegoProcessThread;
@@ -89,7 +89,7 @@ public class Embed extends StegoProcessThread {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
 
-			((F5Notification) a).onFailure();
+			((PluginNotificationListener) a).onFailure();
 		}
 	}
 

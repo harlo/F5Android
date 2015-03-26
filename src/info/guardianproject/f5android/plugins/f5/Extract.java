@@ -1,6 +1,6 @@
 package info.guardianproject.f5android.plugins.f5;
 
-import info.guardianproject.f5android.plugins.f5.F5Buffers.F5Notification;
+import info.guardianproject.f5android.plugins.PluginNotificationListener;
 import info.guardianproject.f5android.plugins.f5.crypt.F5Random;
 import info.guardianproject.f5android.plugins.f5.crypt.Permutation;
 import info.guardianproject.f5android.plugins.f5.james.Jpeg;
@@ -59,17 +59,17 @@ public class Extract extends StegoProcessThread {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
 
-			((F5Notification) a).onFailure();
+			((PluginNotificationListener) a).onFailure();
 		} catch (InterruptedException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
 			
-			((F5Notification) a).onFailure();
+			((PluginNotificationListener) a).onFailure();
 		} catch(NullPointerException e) {
 			Log.e(Jpeg.LOG, e.toString());
 			e.printStackTrace();
 
-			((F5Notification) a).onFailure();
+			((PluginNotificationListener) a).onFailure();
 		}
 
 	}
@@ -211,7 +211,7 @@ public class Extract extends StegoProcessThread {
 
 		if (nBytesExtracted < extractedFileLength) {
 			Log.d(Jpeg.LOG, "Incomplete file: only " + nBytesExtracted + " of " + extractedFileLength + " bytes extracted");
-			((F5Notification) a).onFailure();
+			((PluginNotificationListener) a).onFailure();
 		} else {
 			((ExtractionListener) a).onExtractionResult(fos);
 		}

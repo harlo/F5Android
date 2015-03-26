@@ -396,7 +396,7 @@ public class HuffmanDecode {
         return tmpBuff;
         */
         f5.setHuffmanDecodeBuffer(pos, 0);
-        f5.update(null);
+        f5.onUpdate(null);
         return pos;
     }
 
