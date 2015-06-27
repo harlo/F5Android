@@ -70,6 +70,11 @@ public class Extract extends StegoProcessThread {
 			e.printStackTrace();
 
 			((PluginNotificationListener) a).onFailure();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			Log.e(Jpeg.LOG, e.toString());
+			e.printStackTrace();
+			
+			((PluginNotificationListener) a).onFailure();
 		}
 
 	}
