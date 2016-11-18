@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_name">F5Android</string>
+	<string name="cleaning_up">Cleaning up\u2026</string>
+	<string name="init_permutation">Initing Permutations\u2026</string>
+	<string name="init_huffman_buffer">Initing Huffman Buffer\u2026</string>
+	<string name="init_coeffs">Initing Coefficients\u2026</string>
+	<string name="querying_image">Querying Image\u2026</string>
+	<string name="setting_huffman_buffer">Setting Huffman Buffer\u2026</string>
+	<string name="reading_huffman_buffer">Reading Huffman Buffer\u2026</string>
+	<string name="downsampling_components">Downsampling Components\u2026</string>
+</resources>
