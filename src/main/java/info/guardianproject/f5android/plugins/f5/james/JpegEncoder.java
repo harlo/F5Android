@@ -635,6 +635,7 @@ public class JpegEncoder {
 
 		// The order of the following headers is quiet inconsequential.
 		// the JFIF header
+		
 		final byte JFIF[] = new byte[18];
 		JFIF[0] = (byte) 0xff; // app0 marker
 		JFIF[1] = (byte) 0xe0;
@@ -660,7 +661,9 @@ public class JpegEncoder {
             JFIF[10] = (byte) 0x00; // 1.00
         }
 		 */
-		WriteArray(JFIF, out);
+
+        // NOT NECESSARY.
+		//WriteArray(JFIF, out);
 
 		// TODO: GET RID OF THIS, TOO
 		// Comment Header
