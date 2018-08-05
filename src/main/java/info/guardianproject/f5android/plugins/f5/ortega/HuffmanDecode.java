@@ -214,7 +214,8 @@ public class HuffmanDecode {
     // }}
 
     // Constructor Method
-    public HuffmanDecode(Activity a, final byte[] data, StegoProcessThread thread_monitor) {
+    public HuffmanDecode(Activity a, final byte[] data, StegoProcessThread thread_monitor)
+            throws IOException {
     	f5 = new F5Buffers(a);
     	this.thread_monitor = thread_monitor;
     	
@@ -228,6 +229,8 @@ public class HuffmanDecode {
                 case 192:
                     sof0();
                     break;
+                case 194: // sof2
+                    throw new IOException("Progressive scan JPEGs not supported by decoder");
                 case 196:
                     dht();
                     break;

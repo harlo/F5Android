@@ -87,22 +87,22 @@ public class JpegEncoder {
 		this.dct = new DCT(this.Quality);
 		this.Huf = new Huffman(this.imageWidth, this.imageHeight);
 		this.f5_seed = f5_seed;
-		
+
 	}
 
 	@SuppressWarnings("static-access")
 	public boolean Compress() {
 		Log.d(thread_monitor.LOG, "NOW COMPRESSING...");
-		
+
 		if(this.thread_monitor.isInterrupted()) { return false; }
 		WriteHeaders(this.outStream);
-		
+
 		if(this.thread_monitor.isInterrupted()) { return false; }
 		WriteCompressedData(this.outStream);
-		
+
 		if(this.thread_monitor.isInterrupted()) { return false; }
 		WriteEOI(this.outStream);
-		
+
 		if(this.thread_monitor.isInterrupted()) { return false; }
 		try {
 			this.outStream.flush();
@@ -191,7 +191,7 @@ public class JpegEncoder {
 				}
 			}
 		}
-		
+
 		if(this.thread_monitor.isInterrupted()) { return; }
 		this.JpegObj.f5.initF5Coeffs(coeffCount);
 
@@ -635,7 +635,7 @@ public class JpegEncoder {
 
 		// The order of the following headers is quiet inconsequential.
 		// the JFIF header
-		
+
 		final byte JFIF[] = new byte[18];
 		JFIF[0] = (byte) 0xff; // app0 marker
 		JFIF[1] = (byte) 0xe0;
@@ -662,15 +662,15 @@ public class JpegEncoder {
         }
 		 */
 
-        // NOT NECESSARY.
-		//WriteArray(JFIF, out);
+        // Not Necessary. Few JPEG encoder omit it.
+		// Conspicuous without.
+		WriteArray(JFIF, out);
 
-		// TODO: GET RID OF THIS, TOO
+
 		// Comment Header
+        // Lie. Claim to be the product of a popular PHP jpeg lib to reduce suspicion.
+        String comment = "CREATOR: gd-jpeg v1.0 (using IJG JPEG v62), quality = 90\n  ";
 
-		/*
-        String comment = new String();
-        comment = this.JpegObj.getComment();
         length = comment.length();
         if (length != 0) {
             final byte COM[] = new byte[length + 4];
@@ -678,10 +678,10 @@ public class JpegEncoder {
             COM[1] = (byte) 0xFE;
             COM[2] = (byte) (length >> 8 & 0xFF);
             COM[3] = (byte) (length & 0xFF);
-            java.lang.System.arraycopy(this.JpegObj.Comment.getBytes(), 0, COM, 4, this.JpegObj.Comment.length());
+            java.lang.System.arraycopy(comment.getBytes(), 0, COM, 4, comment.length());
             WriteArray(COM, out);
         }
-		 */
+
 
 		// The DQT header
 		// 0 is the luminance index and 1 is the chrominance index

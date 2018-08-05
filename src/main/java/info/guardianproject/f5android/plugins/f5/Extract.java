@@ -83,7 +83,11 @@ public class Extract extends StegoProcessThread {
 		carrier = new byte[flength];
 		fis.read(carrier);
 
-		final HuffmanDecode hd = new HuffmanDecode(a, carrier, this);
+		HuffmanDecode hd = null;
+		try{
+			hd = new HuffmanDecode(a, carrier, this);
+		} catch(IOException e) {throw e;}
+
 		Log.d(Jpeg.LOG, "Huffman decoding starts");
 		//coeff = hd.decode();
 		int coeff_length = hd.decode();
