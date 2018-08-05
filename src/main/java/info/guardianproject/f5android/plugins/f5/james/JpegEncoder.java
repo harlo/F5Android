@@ -668,7 +668,7 @@ public class JpegEncoder {
 
 
 		// Comment Header
-
+        // Lie. Claim to be the product of a popular PHP jpeg lib to reduce suspicion.
         String comment = "CREATOR: gd-jpeg v1.0 (using IJG JPEG v62), quality = 90\n  ";
 
         length = comment.length();
